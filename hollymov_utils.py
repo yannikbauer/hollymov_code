@@ -2,12 +2,15 @@ import numpy as np
 import matplotlib.pyplot as plt
 from lxml import etree
 import sys
+import datajoint as dj
+
 sys.path.append('../../djd')
 
 import djd.util
 import djd.stimulus
 from djd.event import Event
 from djd.unit import Unit
+from djd.stimulus import Stimulus
 
 
 def get_xptranges_spont(key):
@@ -153,7 +156,7 @@ def get_tranges_cond_swit(tranges_in):
     return tranges_w_diff_cond_bef
 
 
-def get_tranges_cond_cont(trangesin):
+def get_tranges_cond_cont(tranges):
     """Get those time ranges where the condition is continued.
     E.g., input would be all opto time ranges that mark an opto stimulation (Event.Times()&key).fetch('ev_tranges')
     and output would be the time ranges of only those seconds that have also an opto stimulation in the second before.
@@ -169,7 +172,7 @@ def get_tranges_cond_cont(trangesin):
         tranges_w_same_cond_bef : np.ndarray
             Time ranges of those seconds that have the same condition in the second before.
     """
-    tranges_flatten = trangesin.flatten()
+    tranges_flatten = tranges.flatten()
     # difference between all tracked event times (also off times)
     tranges_diff_all = np.diff(tranges_flatten)
     # delete every second element because that is the stimulation length of 1s
@@ -179,7 +182,7 @@ def get_tranges_cond_cont(trangesin):
     # add +1 to get the correct index
     idx_onset = np.add(idx_pause, 1)
     # get all real opto ON times with no opto stim in the second before
-    onset_time_w_same_cond_bef = trangesin[idx_onset, 0]
+    onset_time_w_same_cond_bef = tranges[idx_onset, 0]
 
     evtranges = np.empty((1, 2))
     # creating an event time ranges vector that has the true ON and OFF times
@@ -193,33 +196,33 @@ def get_tranges_cond_cont(trangesin):
     return tranges_w_same_cond_bef
 
 
-def psth_cond_trace(m, s, e, u, offset):
-    """Plot PSTH of the 4 conditions resulting of the hollymov stimulus with opto/no opto continuous condition as semi-
-    transparent lines.
+def psth_cond_trace(key, offsets=[-0.5, 0.5], figsize=None, title=True, ax=None):
+    """Plot PSTH of the 4 conditions resulting of the hollymov stimulus with opto/no opto continuous condition as a
+    baseline. The baseline of the continuous conditions is calculated as means of the spike firing rate.
 
-        Parameters
-        ----------
-        m : str
-            mouse ID, e.g., 'Ntsr1Cre_2019_0003'
-        s: int
-            series ID of the experiment
-        e: int
-            experiment ID
-        u: int
-            unit ID
-        offset: np.ndarray, optional
-            Defines the time range of the PSTH w.r.t. the potential opto switch marking x=0.
+        key : dict
+            Contains at least 3 entries: 'm': mouse ID e.g. 'Ntsr1Cre_2019_0003', 's' series ID of the experiment,
+            'e' experiment ID. Could also specify 'u' the unit ID. If the unit is not specify, all units are plotted.
+        offsets: np.ndarray, optional
+            Defines the time range of the PSTH w.r.t. the potential opto switch at time 0.
+        figsize : int
+             optionally define figure size
+        title : bool
+            set True to get title that specifies the mouse, series, experiment, and unit
+        ax :
+            initial input
 
         Returns
         -------
-        a : plt.plot
-            PSTH plot.
-    """
-    key = {'m': m, 's': str(s), 'e': str(e), 'u': str(u)}
-    # get stimulus time ranges
-    stim_tranges, _ = djd.stimulus.Stimulus.Trial.get_tranges(djd.stimulus.Stimulus.Trial() & key)
+        axes : list of objects
+            figure with one subplot per unit
+     """
+    # adjust offset wrt to get_psth()
+    offsets = [offsets[0], -(1 - offsets[1])]
 
-    uid = int(key['u'])
+    # get stimulus time ranges
+    stim_tranges, _ = (Stimulus.Trial() & key).get_tranges()
+
     evkey = key
     evkey.update({'ev_chan': 'opto1'})
 
@@ -236,75 +239,96 @@ def psth_cond_trace(m, s, e, u, offset):
     tranges_noopto = tranges_all[no_opto]
 
     # list with all conditions:
-    # (1) opto on switch
-    # (2) opto on continuity
-    # (3) opto off switch
-    # (4) no opto continuity
+    # (1) opto on switch / suppression off switch
+    # (2) opto on continuity / suppression continuously off
+    # (3) opto off switch / suppression on switch
+    # (4) no opto continuity / suppression continuously on
     tranges_conds = [get_tranges_cond_swit(tranges_opto),
                      get_tranges_cond_cont(tranges_opto),
                      get_tranges_cond_swit(tranges_noopto),
-                     get_tranges_cond_cont(tranges_noopto)]
-    labels = ['opto switch on', 'opto continued', 'opto switch off', 'no opto']
+                     get_tranges_cond_cont(tranges_noopto),
+                    ]
+    labels = ['on-off', 'off-off', 'off-on','on-on']
     colors = ['tab:blue', 'tab:blue', 'k', 'k']
     lines = ['-', ':', '-', ':']
     widths = [1.5, 3, 1.5, 3]
     visible = [1.0, 0.2, 1.0, 0.2]
 
-    # plotting
-    f, a = plt.subplots()  # make a new figure and axes
+    # loop through conditions and get psths
+    psths_cond = []
     for cond in range(len(tranges_conds)):
         # only tranges that are in stimulus time ranges
         tranges_cond = tranges_conds[cond]
         tranges_cond_stim = tranges_cond[djd.util.intersect_tranges(stim_tranges, tranges_cond)]
-        midbins, psths, rasters, tranges, stimis = (Unit.Spikes() & key).get_psths(offsets=offset,
-                                                                                   trangesin=tranges_cond_stim)
-        a.plot(midbins, psths[int(key['u'])], ls='-', marker='None', label=labels[cond], c=colors[cond],
-               lw=widths[cond], alpha=visible[cond], zorder=2)
 
-    a.axvline(x=0, linestyle=':', c='grey', zorder=1)
-    a.set_xlabel("Time (s)")
-    a.set_ylabel("Firing rate (Hz)")
-    a.legend(title='stimi', frameon=False)
-    titlestr = '%s s%02d e%02d u%02d PSTH' % (key['m'], int(key['s']), int(key['e']), uid)
-    a.set_title(titlestr)
-    f.tight_layout(pad=0.3)  # crop figure to contents
+        midbins, psths, rasters, tranges, stimis = (Unit.Spikes() & key).get_psths(offsets=offsets,
+                                                                                   tranges=tranges_cond_stim)
+
+        # list (len=num_cond) of dicts with key as uid
+        psths_cond.append(psths)
+
+    # plotting
+    # save initial ax input. This is important if several units are plotted in the loop
+    # because ax will be overwritten
+    ax_init = ax
+    uids = sorted(psths_cond[0])
+    keys = (Unit.Spikes() & key).fetch(dj.key)
+    axes = []
+    for uid, key in zip(uids, keys):
+        assert uid == key['u']  # sanity check
+        if ax_init is None:
+            f, a = plt.subplots(figsize=figsize)  # make a new figure and axes
+        else:
+            a = ax
+        for cond in range(len(tranges_conds)):
+            a.plot(midbins, psths_cond[cond][uid], ls='-', marker='None', label=labels[cond], c=colors[cond],
+                   lw=widths[cond], alpha=visible[cond], zorder=2)
+        a.axvline(x=0, linestyle=':', c='grey', zorder=1)
+        a.set_xlabel("Time (s)")
+        a.set_ylabel("Firing rate (Hz)")
+        a.legend(title=' L6 CT feedback', frameon=False, fontsize=13)
+
+        titlestr = '%s s%02d e%02d u%02d PSTH' % (key['m'], int(key['s']), int(key['e']), uid)
+        if title:
+            a.set_title(titlestr)
+
+        axes.append(a)
+
+    return axes
 
 
-def psth_cond_base(m, s, e, u, offset):
+def psth_cond_base(key, offsets=[-0.5, 0.5], figsize=None, title=True, ax=None):
     """Plot PSTH of the 4 conditions resulting of the hollymov stimulus with opto/no opto continuous condition as a
     baseline. The baseline of the continuous conditions is calculated as means of the spike firing rate.
 
-        Parameters
-        ----------
-        m : str
-            mouse ID, e.g., 'Ntsr1Cre_2019_0003'
-        s: int
-            series ID of the experiment
-        e: int
-            experiment ID
-        u: int
-            unit ID
-        offset: np.ndarray, optional
-            Defines the time range of the PSTH w.r.t. the potential opto switch marking x=0.
-        eventfill: bool, optional, default=False
-            If True time range of opto stimulation will be filled with transparent blue.
+        key : dict
+            Contains at least 3 entries: 'm': mouse ID e.g. 'Ntsr1Cre_2019_0003', 's' series ID of the experiment,
+            'e' experiment ID. Could also specify 'u' the unit ID. If the unit is not specify, all units are plotted.
+        offsets: np.ndarray, optional
+            Defines the time range of the PSTH w.r.t. the potential opto switch at time 0.
+        figsize : int
+             optionally define figure size
+        title : bool
+            set True to get title that specifies the mouse, series, experiment, and unit
+        ax :
+            initial input
 
         Returns
         -------
-        a : plt.plot
-            PSTH plot.
+        axes : list of objects
+            figure with one subplot per unit
      """
-    key = {'m': m, 's': str(s), 'e': str(e), 'u': str(u)}
-    # get stimulus time ranges
-    stim_tranges, _ = (djd.stimulus.Stimulus.Trial() & key).get_tranges()
+    # adjust offset wrt to get_psth()
+    offsets = [offsets[0], -(1 - offsets[1])]
 
-    uid = int(key['u'])
+    # get stimulus time ranges
+    stim_tranges, _ = (Stimulus.Trial() & key).get_tranges()
+
     evkey = key
     evkey.update({'ev_chan': 'opto1'})
 
     # fetch the event times & get array with all time ranges
     evtimesopto = (Event.Times() & evkey).fetch('ev_tranges')
-    # evtimesopto = (Event.Times()&{'m': 'Ntsr1Cre_2019_0003', 's': '4', 'e': '9', 'u':'1','ev_chan':'opto1'}).fetch('ev_tranges')
     tranges_all = get_all_tranges(evtimesopto)
 
     # get the opto, no opto mask
@@ -329,36 +353,58 @@ def psth_cond_base(m, s, e, u, offset):
         get_tranges_cond_cont(tranges_opto),
         get_tranges_cond_cont(tranges_noopto),
     ]
-    labels_swit = ['opto switch on', 'opto switch off']
-    labels_cont = ['opto continued', 'no opto']
+    labels_swit = ['on-off', 'off-on']
+    labels_cont = ['off-off', 'on-on']
     colors = ['tab:blue', 'k']
 
-    # plotting
-    f, a = plt.subplots()  # make a new figure and axes
-    for cond in range(2):
-        # only tranges that are in stimulus time ranges
+    # loop through conditions and get psths
+    psths_swit = []
+    cond_cont_base = []
+    for cond in range(len(tranges_swits)):
         tranges_swit = tranges_swits[cond]
         tranges_swit_stim = tranges_swit[djd.util.intersect_tranges(stim_tranges, tranges_swit)]
         # get psths of switch conditions
-        midbins, psths_swit, _, _, _ = (Unit.Spikes() & key).get_psths(offsets=offset, trangesin=tranges_swit_stim)
-        a.plot(midbins, psths_swit[int(key['u'])], ls='-', marker='None', label=labels_swit[cond], c=colors[cond],
-               zorder=2)
+        midbins, psths, _, _, _ = (Unit.Spikes() & key).get_psths(offsets=offsets, tranges=tranges_swit_stim)
+        # list (len=num_cond) of dicts with key as uid
+        psths_swit.append(psths)
 
         # only tranges that are in stimulus time ranges
         tranges_cont = tranges_conts[cond]
         tranges_cont_stim = tranges_cont[djd.util.intersect_tranges(stim_tranges, tranges_cont)]
         # get psths of continuous conditions
-        _, psths_cont, _, _, _ = (Unit.Spikes() & key).get_psths(offsets=offset, trangesin=tranges_cont_stim)
-        a.axhline(y=np.mean(psths_cont[int(key['u'])]), linestyle='--', c=colors[cond], label=labels_cont[cond],
-                  zorder=1)
+        _, psths_cont, _, _, _ = (Unit.Spikes() & key).get_psths(offsets=offsets, tranges=tranges_cont_stim)
+        cond_cont_base.append(psths_cont)
 
-    a.axvline(x=0, linestyle=':', c='grey', zorder=1)
-    a.set_xlabel("Time (s)")
-    a.set_ylabel("Firing rate (Hz)")
-    a.legend(title='stimi', frameon=False)
-    titlestr = '%s s%02d e%02d u%02d PSTH' % (key['m'], int(key['s']), int(key['e']), uid)
-    a.set_title(titlestr)
-    f.tight_layout(pad=0.3)  # crop figure to contents
+    # plotting
+    # save initial ax input. This is important if several units are plotted in the loop
+    # because ax will be overwritten
+    ax_init = ax
+    uids = sorted(psths_swit[0])
+    keys = (Unit.Spikes() & key).fetch(dj.key)
+    axes = []
+    for uid, key in zip(uids, keys):
+        assert uid == key['u']  # sanity check
+        if ax_init is None:
+            f, a = plt.subplots(figsize=figsize)  # make a new figure and axes
+        else:
+            a = ax
+        for cond in range(len(tranges_swits)):
+            a.plot(midbins, psths_swit[cond][uid], ls='-', marker='None', label=labels_swit[cond], c=colors[cond],
+                   zorder=2)
+            a.axhline(y=np.mean(cond_cont_base[cond][int(key['u'])]), linestyle='--', c=colors[cond], label=labels_cont[cond],
+                      zorder=1)
+        a.axvline(x=0, linestyle=':', c='grey', zorder=1)
+        a.set_xlabel("Time (s)")
+        a.set_ylabel("Firing rate (Hz)")
+        a.legend(title=' L6 CT feedback', frameon=False)
+
+        titlestr = '%s s%02d e%02d u%02d PSTH' % (key['m'], int(key['s']), int(key['e']), uid)
+        if title:
+            a.set_title(titlestr)
+
+        axes.append(a)
+
+    return axes
 
 
 def bar_cond(m, s, e, u):
@@ -388,7 +434,7 @@ def bar_cond(m, s, e, u):
      """
     key = {'m': m, 's': str(s), 'e': str(e), 'u': str(u)}
     # get stimulus time ranges
-    stim_tranges, _ = (djd.stimulus.Stimulus.Trial() & key).get_tranges()
+    stim_tranges, _ = (Stimulus.Trial() & key).get_tranges()
 
     uid = int(key['u'])
     evkey = key
@@ -425,7 +471,7 @@ def bar_cond(m, s, e, u):
         # only tranges that are in stimulus time ranges
         tranges_cond = tranges_conds[cond]
         tranges_cond_stim = tranges_cond[djd.util.intersect_tranges(stim_tranges, tranges_cond)]
-        _, psths, _, _, _ = (Unit.Spikes() & key).get_psths(offsets=[-1.0, 0.0], trangesin=tranges_cond_stim)
+        _, psths, _, _, _ = (Unit.Spikes() & key).get_psths(offsets=[-1.0, 0.0], tranges=tranges_cond_stim)
         fr_split = np.array_split(psths[int(key['u'])], 2)
         fr_prior.append(np.mean(fr_split[0]))
         std_prior.append(np.std(fr_split[0]))
