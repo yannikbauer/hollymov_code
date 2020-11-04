@@ -6,30 +6,29 @@ import datajoint as dj
 
 sys.path.append('../../djd')
 
-import djd.util
-import djd.stimulus
+from djd import util
+from djd import stimulus
 from djd.event import Event
 from djd.unit import Unit
 from djd.stimulus import Stimulus
 
 
 def get_xptranges_spont(key):
-    """ Gives the Expo time ranges for the spontaneous activtiy that is tested in the hollymov experiment before and
-    after the movies were shown ("spontOpto" stimulus = grey screen).
+    """ Gives time ranges for the spontaneous activity that is recorded in response to the
+    gray screen (60 s before and and after the movie is shown.
 
-        Parameters
-        ----------
-        key : dict
-            contains specifiction on mouse ID, series, experiment and unit
-            E.g., {'m': 'Ntsr1Cre_2019_0003', 's': 4, 'e': 9}
+    Parameters
+    ----------
+    key : dict
+        Unit key in the form {mouse ID, series, experiment, unit}
+        E.g., {'m': 'Ntsr1Cre_2019_0003', 's': 4, 'e': 9}
 
-        Returns
-        -------
-        a : np.ndarray
-            containing all time ranges (start and stop) of the spontOpto "stimulus"
+    Returns
+    -------
+    xptranges : np.ndarray
+        containing all time ranges (start and stop) of the spontOpto "stimulus"
     """
-    #expofname = util.key2datafname(key, filetype='.xml', force_exist=True)
-    expofname = djd.util.key2datafname(key, filetype='.xml', force_exist=True)
+    expofname = util.key2datafname(key, filetype='.xml', force_exist=True)
     # read the xml file
     tree = etree.parse(expofname)
     root = tree.getroot()
@@ -46,46 +45,48 @@ def get_xptranges_spont(key):
     spontslotis = np.where(spontslotis)[0]  # unpack tuple to get array
     spontslots = [rootslots[si] for si in spontslotis]
     stimslotIDs = [spontslot.get('ID') for spontslot in spontslots]  # leave as strings
-    xptranges, _ = djd.stimulus._get_expo_tranges_slotids(rootpasses, environment, stimslotIDs)
+    xptranges, _ = stimulus._get_expo_tranges_slotids(rootpasses, environment, stimslotIDs)
     return xptranges
 
 
-def get_all_tranges(tranges_opto):
+def get_all_tranges(key):
     """Get time ranges of all seconds.
     For the hollymov stimulus, every second there is a 50/50 chance of optogenetic stimulation.
-    Event.Times() only provides the time ranges of the seconds with opto stimulation. If you want to compare neuron
-    activity w.r.t. opto/no opto condition in unit.psth() with customized time ranges, you need all time
-    ranges (output of this function).
+    Event.Times() only provides the time ranges of the seconds with opto stimulation. To
+    plot neuron activity w.r.t. opto/no opto condition using unit.psth(), all time ranges
+    are required: the time ranges of seconds with opto stimulation and without stimulation.
 
-        Parameters
-        ----------
-        tranges_opto : np.ndarray
-            Time ranges of seconds with optogenetic stimulation.
-            e.g., (Event.Times()&{'m':'Ntsr1Cre_2019_0003','s':4,'e':5,'u':14,'ev_chan':'opto1'}).fetch('ev_tranges')
+    Parameters
+    ----------
+    key : dict
+        Unit key in the form {mouse ID, series, experiment, unit}
+        E.g., {'m': 'Ntsr1Cre_2019_0003', 's': 4, 'e': 9}
 
-        Returns
-        -------
-        tranges_all : np.ndarray
-            Time ranges of all seconds (not only the ones with opto stimulation).
+
+    Returns
+    -------
+    tranges_all : np.ndarray
+        Time ranges of all seconds during hmov presentation (not only the ones with opto
+        stimulation) excluding spontaneous opto stimulation before and after the movie.
+
     """
-    # initialize the first tranges_opto
-    tranges_opto = tranges_opto[0]
-    # initialize the "all" tranges vector
-    ## TODO: consider changing this into list which is converted back into np.array because this is faster
-    tranges_all = tranges_opto[0, :]
-
-    # loop through the events; as np.diff() is used, use length-1 otherwise index out of range
-    for trange in range(1, tranges_opto.shape[0]):
-        trange_current_start = tranges_opto[trange, 0]
-        trange_last_stop = tranges_opto[trange - 1, 1]
+    tranges, _, _ = (Unit().Spikes() & key).get_tranges()
+    tranges_opto = (Event.Times() & key & {'ev_chan':'opto1'}).fetch1('ev_tranges')
+    trange_last_stop = 0.0
+    tranges_all_l = []
+    for i, trange in enumerate(tranges_opto):
+        trange_current_start = trange[0]
         diff_opto = trange_current_start - trange_last_stop
-        # check if there is opto stim in the next second
-        if diff_opto < 1.0:
-            trange_start = tranges_opto[trange, 0]
-            trange_stop = tranges_opto[trange, 1]
-            tranges_next = np.column_stack((trange_start, trange_stop))
-            # append the array with opto event time ranges
-            tranges_all = np.row_stack((tranges_all, tranges_next))
+        # if there is opto stim in the next second
+        if diff_opto <= 0.9:
+            tranges_all_l.append(trange)
+            trange_last_stop = trange[1]
+        # if there is approx. 1 sec between opto stimulations
+        elif (diff_opto > 0.9) & (diff_opto <= 1.0):
+            tranges_all_l.append(np.array([trange_last_stop, trange_current_start]))
+            tranges_all_l.append(trange)
+            trange_last_stop = trange[1]
+        # if there is one or more seconds without opto stimulation
         else:
             # if there is no opto stim in the next second
             # check the number of seconds before the next opto stim
@@ -99,18 +100,17 @@ def get_all_tranges(tranges_opto):
                 # create a new start and stop time w.o. opto that takes jitter into account
                 trange_i_start = round(trange_last_stop + stim_jitter_each, 4)
                 trange_i_stop = trange_i_start + 1
-                # update new last trange stop
+                tranges_all_l.append(np.array([trange_i_start, trange_i_stop]))
                 trange_last_stop = trange_i_stop
-                # add the times to tranges_all
-                tranges_i_next = np.column_stack((trange_i_start, trange_i_stop))
-                tranges_all = np.row_stack((tranges_all, tranges_i_next))
-            # select the next following opto times
-            trange_start = tranges_opto[trange, 0]
-            trange_stop = tranges_opto[trange, 1]
-            tranges_next = np.column_stack((trange_start, trange_stop))
-            # append the array with the next opto event time tranges
-            tranges_all = np.row_stack((tranges_all, tranges_next))
-    return tranges_all
+                # update new last trange stop
+            tranges_all_l.append(trange)
+            trange_last_stop = trange[1]
+    tranges_all = np.vstack(tranges_all_l)
+    # only include tranges during movie presentation
+    tranges_all_hmov = np.squeeze(tranges_all[
+        np.where(np.logical_and(tranges_all[:,0] >= tranges[0][0], 
+                                tranges_all[:,1] <= tranges[-1][1])), :])
+    return tranges_all_hmov
 
 
 def get_tranges_cond_swit(tranges_in):
@@ -218,7 +218,7 @@ def psth_cond_trace(key, offsets=[-0.5, 0.5], figsize=None, title=True, ax=None)
             figure with one subplot per unit
      """
     # adjust offset wrt to get_psth()
-    offsets = [offsets[0], -(1 - offsets[1])]
+    offset = [offsets[0], -(1 - offsets[1])]
 
     # get stimulus time ranges
     stim_tranges, _ = (Stimulus.Trial() & key).get_tranges()
@@ -228,73 +228,79 @@ def psth_cond_trace(key, offsets=[-0.5, 0.5], figsize=None, title=True, ax=None)
 
     # fetch the event times & get array with all time ranges
     evtimesopto = (Event.Times() & evkey).fetch('ev_tranges')
-    tranges_all = get_all_tranges(evtimesopto)
+    if evtimesopto.size == 0:
+        print('No opto events populated in Event.Times() for unit '
+              '{:s} s{:02d} e{:02d} u{:02d}.\n  Skip plotting.'.format(
+                                            evkey['m'], evkey['s'], evkey['e'], evkey['u']))
+    else:
+        tranges_all = get_all_tranges(evkey)
 
-    # get the opto, no opto mask
-    _, _, opto = (Unit.Spikes() & key).get_tranges(tranges=tranges_all)
-    no_opto = ~opto
+        # get the opto, no opto mask
+        _, _, opto = (Unit.Spikes() & key).get_tranges(tranges=tranges_all)
+        no_opto = ~opto
 
-    # get array with time ranges depending on conditon
-    tranges_opto = tranges_all[opto]
-    tranges_noopto = tranges_all[no_opto]
+        # get array with time ranges depending on conditon
+        tranges_opto = tranges_all[opto]
+        tranges_noopto = tranges_all[no_opto]
 
-    # list with all conditions:
-    # (1) opto on switch / suppression off switch
-    # (2) opto on continuity / suppression continuously off
-    # (3) opto off switch / suppression on switch
-    # (4) no opto continuity / suppression continuously on
-    tranges_conds = [get_tranges_cond_swit(tranges_opto),
-                     get_tranges_cond_cont(tranges_opto),
-                     get_tranges_cond_swit(tranges_noopto),
-                     get_tranges_cond_cont(tranges_noopto),
-                    ]
-    labels = ['on-off', 'off-off', 'off-on','on-on']
-    colors = ['tab:blue', 'tab:blue', 'k', 'k']
-    lines = ['-', ':', '-', ':']
-    widths = [1.5, 3, 1.5, 3]
-    visible = [1.0, 0.2, 1.0, 0.2]
+        # list with all conditions:
+        # (1) opto on switch / suppression off switch
+        # (2) opto on continuity / suppression continuously off
+        # (3) opto off switch / suppression on switch
+        # (4) no opto continuity / suppression continuously on
+        tranges_conds = [get_tranges_cond_swit(tranges_opto),
+                         get_tranges_cond_cont(tranges_opto),
+                         get_tranges_cond_swit(tranges_noopto),
+                         get_tranges_cond_cont(tranges_noopto),
+                        ]
+        labels = ['on-off', 'off-off', 'off-on','on-on']
+        colors = ['tab:blue', 'tab:blue', 'k', 'k']
+        lines = ['-', ':', '-', ':']
+        widths = [1.5, 3, 1.5, 3]
+        visible = [1.0, 0.2, 1.0, 0.2]
 
-    # loop through conditions and get psths
-    psths_cond = []
-    for cond in range(len(tranges_conds)):
-        # only tranges that are in stimulus time ranges
-        tranges_cond = tranges_conds[cond]
-        tranges_cond_stim = tranges_cond[djd.util.intersect_tranges(stim_tranges, tranges_cond)]
-
-        midbins, psths, rasters, tranges, stimis = (Unit.Spikes() & key).get_psths(offsets=offsets,
-                                                                                   tranges=tranges_cond_stim)
-
-        # list (len=num_cond) of dicts with key as uid
-        psths_cond.append(psths)
-
-    # plotting
-    # save initial ax input. This is important if several units are plotted in the loop
-    # because ax will be overwritten
-    ax_init = ax
-    uids = sorted(psths_cond[0])
-    keys = (Unit.Spikes() & key).fetch(dj.key)
-    axes = []
-    for uid, key in zip(uids, keys):
-        assert uid == key['u']  # sanity check
-        if ax_init is None:
-            f, a = plt.subplots(figsize=figsize)  # make a new figure and axes
-        else:
-            a = ax
+        # loop through conditions and get psths
+        psths_cond = []
+        midbins_cond = []
         for cond in range(len(tranges_conds)):
-            a.plot(midbins, psths_cond[cond][uid], ls='-', marker='None', label=labels[cond], c=colors[cond],
-                   lw=widths[cond], alpha=visible[cond], zorder=2)
-        a.axvline(x=0, linestyle=':', c='grey', zorder=1)
-        a.set_xlabel("Time (s)")
-        a.set_ylabel("Firing rate (Hz)")
-        a.legend(title=' L6 CT feedback', frameon=False, fontsize=13)
+            # only tranges that are in stimulus time ranges
+            tranges_cond = tranges_conds[cond]
+            tranges_cond_stim = tranges_cond[util.intersect_tranges(stim_tranges, tranges_cond)]
 
-        titlestr = '%s s%02d e%02d u%02d PSTH' % (key['m'], int(key['s']), int(key['e']), uid)
-        if title:
-            a.set_title(titlestr)
+            midbins, psths, rasters, tranges, stimis = (Unit.Spikes() & key).get_psths(offsets=offset,
+                                                                                       tranges=tranges_cond_stim)
+            # list (len=num_cond) of dicts with key as uid
+            psths_cond.append(psths)
+            midbins_cond.append(midbins)
 
-        axes.append(a)
+        # plotting
+        # save initial ax input. This is important if several units are plotted in the loop
+        # because ax will be overwritten
+        ax_init = ax
+        uids = sorted(psths_cond[0])
+        keys = (Unit.Spikes() & key).fetch(dj.key)
+        axes = []
+        for uid, key in zip(uids, keys):
+            assert uid == key['u']  # sanity check
+            if ax_init is None:
+                f, a = plt.subplots(figsize=figsize)  # make a new figure and axes
+            else:
+                a = ax
+            for cond in range(len(tranges_conds)):
+                a.plot(midbins_cond[cond], psths_cond[cond][uid], ls='-', marker='None', label=labels[cond], c=colors[cond],
+                       lw=widths[cond], alpha=visible[cond], zorder=2)
+            a.axvline(x=0, linestyle=':', c='grey', zorder=1)
+            a.set_xlabel("Time (s)")
+            a.set_ylabel("Firing rate (Hz)")
+            a.legend(title=' L6 CT feedback', frameon=False, fontsize=13)
 
-    return axes
+            titlestr = '%s s%02d e%02d u%02d PSTH' % (key['m'], int(key['s']), int(key['e']), uid)
+            if title:
+                a.set_title(titlestr)
+
+            axes.append(a)
+
+        return axes
 
 
 def psth_cond_base(key, offsets=[-0.5, 0.5], figsize=None, title=True, ax=None):
@@ -329,7 +335,7 @@ def psth_cond_base(key, offsets=[-0.5, 0.5], figsize=None, title=True, ax=None):
 
     # fetch the event times & get array with all time ranges
     evtimesopto = (Event.Times() & evkey).fetch('ev_tranges')
-    tranges_all = get_all_tranges(evtimesopto)
+    tranges_all = get_all_tranges(evkey)
 
     # get the opto, no opto mask
     _, _, opto = (Unit.Spikes() & key).get_tranges(tranges=tranges_all)
@@ -362,7 +368,7 @@ def psth_cond_base(key, offsets=[-0.5, 0.5], figsize=None, title=True, ax=None):
     cond_cont_base = []
     for cond in range(len(tranges_swits)):
         tranges_swit = tranges_swits[cond]
-        tranges_swit_stim = tranges_swit[djd.util.intersect_tranges(stim_tranges, tranges_swit)]
+        tranges_swit_stim = tranges_swit[util.intersect_tranges(stim_tranges, tranges_swit)]
         # get psths of switch conditions
         midbins, psths, _, _, _ = (Unit.Spikes() & key).get_psths(offsets=offsets, tranges=tranges_swit_stim)
         # list (len=num_cond) of dicts with key as uid
@@ -370,7 +376,7 @@ def psth_cond_base(key, offsets=[-0.5, 0.5], figsize=None, title=True, ax=None):
 
         # only tranges that are in stimulus time ranges
         tranges_cont = tranges_conts[cond]
-        tranges_cont_stim = tranges_cont[djd.util.intersect_tranges(stim_tranges, tranges_cont)]
+        tranges_cont_stim = tranges_cont[util.intersect_tranges(stim_tranges, tranges_cont)]
         # get psths of continuous conditions
         _, psths_cont, _, _, _ = (Unit.Spikes() & key).get_psths(offsets=offsets, tranges=tranges_cont_stim)
         cond_cont_base.append(psths_cont)
@@ -443,7 +449,7 @@ def bar_cond(m, s, e, u):
     # fetch the event times & get array with all time ranges
     evtimesopto = (Event.Times() & evkey).fetch('ev_tranges')
     # evtimesopto = (Event.Times()&{'m': 'Ntsr1Cre_2019_0003', 's': '4', 'e': '9', 'u':'1','ev_chan':'opto1'}).fetch('ev_tranges')
-    tranges_all = get_all_tranges(evtimesopto)
+    tranges_all = get_all_tranges(evkey)
 
     # get the opto, no opto mask
     _, _, opto = (Unit.Spikes() & key).get_tranges(tranges=tranges_all)
@@ -470,7 +476,7 @@ def bar_cond(m, s, e, u):
     for cond in range(len(tranges_conds)):
         # only tranges that are in stimulus time ranges
         tranges_cond = tranges_conds[cond]
-        tranges_cond_stim = tranges_cond[djd.util.intersect_tranges(stim_tranges, tranges_cond)]
+        tranges_cond_stim = tranges_cond[util.intersect_tranges(stim_tranges, tranges_cond)]
         _, psths, _, _, _ = (Unit.Spikes() & key).get_psths(offsets=[-1.0, 0.0], tranges=tranges_cond_stim)
         fr_split = np.array_split(psths[int(key['u'])], 2)
         fr_prior.append(np.mean(fr_split[0]))
