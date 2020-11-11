@@ -89,6 +89,11 @@ def get_all_tranges(key, include_spont=False):
     """
     tranges, _, _ = (Unit().Spikes() & key).get_tranges()
     tranges_opto = (Event.Times() & key & {'ev_chan':'opto1'}).fetch1('ev_tranges')
+    # check that opto stimulations are not longer than 1 s
+    if any(np.diff(tranges_opto) > 1):
+        print("Opto stimulations longer than 1 sec detected. Including only opto stimulations "
+              "of 1 sec.")
+        tranges_opto = np.delete(tranges_opto, np.where(np.diff(tranges_opto) > 1.1)[0], axis=0)
     trange_last_stop = 0.0
     tranges_all_l = []
     for i, trange in enumerate(tranges_opto):
