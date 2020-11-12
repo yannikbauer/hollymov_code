@@ -1,0 +1,19 @@
+# Ignore file types
+*__pycache__
+*Icon?
+*.DS_Store
+#*.png
+#*.jpg
+#*.pdf
+
+# Package egg-links
+hmov_code.egg-info/
+
+# PyCharm files/folders
+*.idea/
+
+# Jupyter Notebook checkpoints
+**.ipynb_checkpoints**
+
+# Ignore specific folders
+#**/figures/
