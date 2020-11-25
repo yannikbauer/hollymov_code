@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt
 from lxml import etree
 # Import DJD modules / tables
 import datajoint as dj
-from djd import hmov
+from djd import hmov_unit
 from djd import util
 from djd import stimulus
 from djd.event import Event
@@ -26,42 +26,6 @@ def main():
     """Print message to the user calling this as a script"""
     print("This .py file is only intended to be imported as a module providing functions, "
           "not to be executed as a standalone script.")
-
-
-def get_xptranges_spont(key):
-    """ Gives time ranges for the spontaneous activity that is recorded in response to the
-    gray screen (60 s before and and after the movie is shown.
-
-    Parameters
-    ----------
-    key : dict
-        Unit key in the form {mouse ID, series, experiment, unit}
-        E.g., {'m': 'Ntsr1Cre_2019_0003', 's': 4, 'e': 9}
-
-    Returns
-    -------
-    xptranges : np.ndarray
-        containing all time ranges (start and stop) of the spontOpto "stimulus"
-    """
-    expofname = util.key2datafname(key, filetype='.xml', force_exist=True)
-    # read the xml file
-    tree = etree.parse(expofname)
-    root = tree.getroot()
-    # get root slots, and passes elements. There's always only one of each of
-    # these pluralized elements, but each can have multiple children:
-    rootslots = root.find('Slots')
-    rootpasses = root.find('Passes')
-    # environment should also be available:
-    environment = root.find('Environment')
-    # find the stimulus SlotIDs:
-    slotlabels = [slot.get('Label') for slot in rootslots.getchildren()]
-    # search for 'stim' in all slot labels:
-    spontslotis = ['spont' in sl.lower() for sl in slotlabels]
-    spontslotis = np.where(spontslotis)[0]  # unpack tuple to get array
-    spontslots = [rootslots[si] for si in spontslotis]
-    stimslotIDs = [spontslot.get('ID') for spontslot in spontslots]  # leave as strings
-    xptranges, _ = stimulus._get_expo_tranges_slotids(rootpasses, environment, stimslotIDs)
-    return xptranges
 
 
 def psth_cond_base(key, offsets=[-0.5, 0.5], figsize=None, title=True, ax=None):
@@ -98,7 +62,7 @@ def psth_cond_base(key, offsets=[-0.5, 0.5], figsize=None, title=True, ax=None):
     evkey.update({'ev_chan': 'opto1'})
 
     # get all time ranges
-    tranges_all = hmov.get_all_tranges(evkey)
+    tranges_all = hmov_unit.get_all_tranges(evkey)
 
     # get the opto, no opto mask
     _, _, opto = (Unit.Spikes() & key).get_tranges(tranges=tranges_all)
@@ -112,15 +76,15 @@ def psth_cond_base(key, offsets=[-0.5, 0.5], figsize=None, title=True, ax=None):
     # (1) opto on switch
     # (2) opto off switch
     tranges_swits = [
-        hmov.get_tranges_cond_swit(tranges_opto),
-        hmov.get_tranges_cond_swit(tranges_noopto),
+        hmov_unit.get_tranges_cond_swit(tranges_opto),
+        hmov_unit.get_tranges_cond_swit(tranges_noopto),
                     ]
     # list with continuous conditions:
     # (3) opto on continuity
     # (4) no opto continuity
     tranges_conts = [
-        hmov.get_tranges_cond_cont(tranges_opto),
-        hmov.get_tranges_cond_cont(tranges_noopto),
+        hmov_unit.get_tranges_cond_cont(tranges_opto),
+        hmov_unit.get_tranges_cond_cont(tranges_noopto),
                     ]
     labels_swit = ['on-off', 'off-on']
     labels_cont = ['off-off', 'on-on']
@@ -219,7 +183,7 @@ def bar_cond(m, s, e, u):
     evkey.update({'ev_chan': 'opto1'})
 
     # get all time ranges
-    tranges_all = hmov.get_all_tranges(evkey)
+    tranges_all = hmov_unit.get_all_tranges(evkey)
 
     # get the opto, no opto mask
     _, _, opto = (Unit.Spikes() & key).get_tranges(tranges=tranges_all)
@@ -234,10 +198,10 @@ def bar_cond(m, s, e, u):
     # (2) opto on continuity
     # (3) opto off switch
     # (4) no opto continuity
-    tranges_conds = [hmov.get_tranges_cond_swit(tranges_opto),
-                     hmov.get_tranges_cond_cont(tranges_opto),
-                     hmov.get_tranges_cond_swit(tranges_noopto),
-                     hmov.get_tranges_cond_cont(tranges_noopto)]
+    tranges_conds = [hmov_unit.get_tranges_cond_swit(tranges_opto),
+                     hmov_unit.get_tranges_cond_cont(tranges_opto),
+                     hmov_unit.get_tranges_cond_swit(tranges_noopto),
+                     hmov_unit.get_tranges_cond_cont(tranges_noopto)]
     fr_prior = []
     fr_after = []
     std_prior = []
