@@ -1,0 +1,17 @@
+[
+  {
+    "glm_paramset": 1,
+    "glm_distr": "softplus",
+    "glm_alpha": 1.0,
+    "glm_lambda": 0.00015,
+    "glm_solver": "batch-gradient",
+    "glm_lr": 0.7,
+    "glm_max_iter": 1000,
+    "glm_tol": 1e-06,
+    "glm_seed": 0,
+    "glm_norm_y": "True",
+    "glm_nlag": 8,
+    "glm_shift": 1,
+    "glm_spat_scaling": 0.06
+  }
+]

@@ -1,0 +1,42 @@
+[
+  {
+    "spl_paramset": 7,
+    "spl_distr": "softplus",
+    "spl_alpha": 1.0,
+    "spl_lambda": 1.0,
+    "spl_lr": 0.01,
+    "spl_max_iter": 2000,
+    "spl_dt": 0.033,
+    "spl_spat_df": 8,
+    "spl_temp_df": 7,
+    "spl_pshf": "False",
+    "spl_pshf_len": 0,
+    "spl_pshf_df": 0,
+    "spl_verb": 200,
+    "spl_metric": "corrcoef",
+    "spl_norm_y": "False",
+    "spl_nlag": 8,
+    "spl_shift": 1,
+    "spl_spat_scaling": 0.06
+  },
+  {
+    "spl_paramset": 8,
+    "spl_distr": "softplus",
+    "spl_alpha": 1.0,
+    "spl_lambda": 1.0,
+    "spl_lr": 0.01,
+    "spl_max_iter": 2000,
+    "spl_dt": 0.033,
+    "spl_spat_df": 8,
+    "spl_temp_df": 7,
+    "spl_pshf": "True",
+    "spl_pshf_len": 8,
+    "spl_pshf_df": 6,
+    "spl_verb": 200,
+    "spl_metric": "corrcoef",
+    "spl_norm_y": "False",
+    "spl_nlag": 8,
+    "spl_shift": 1,
+    "spl_spat_scaling": 0.06
+  }
+]
