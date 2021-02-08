@@ -237,3 +237,29 @@ def bar_cond(m, s, e, u):
                  ncol=2, fancybox=True)
     titlestr = '%s s%02d e%02d u%02d' % (key['m'], int(key['s']), int(key['e']), uid)
     a.set_title(titlestr)
+    
+def insert_year(mouse):
+    """
+    Insert year into the iTracking movie file name if missing.
+    You have to mount the filesystem first via SSHFS with `hux -r`.
+    
+    Parameters
+    ----------
+    mouse: str
+        Mouse name (e.g. 'Ntsr1Cre_2020_0002')
+    """
+    dir_name = os.path.join('/mnt/hux/mudata/iTracking/', mouse)
+    os.chdir(dir_name)
+    mouse_info_split = mouse.split('_')
+    for subdir, dirs, files in os.walk(dir_name):
+        for file in files:
+            file_info_split = file.split('_')
+            if file_info_split[1] != mouse_info_split[1]:
+                file_info_split.insert(1,mouse_info_split[1])
+                filename_w_year = '_'.join(file_info_split)
+                dir_new = os.path.join(subdir,filename_w_year)
+                dir_old = os.path.join(subdir,file)
+                os.rename(dir_old, dir_new)
+                print('Renaming {:s} into {:s}'.format(dir_old, dir_new))
+            else:
+                pass
