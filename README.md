@@ -4,7 +4,9 @@ Additional analysis code for Hollywood movie experiments on dLGN recordings. The
 have been recorded in the scope of V1 L6 (primary visual cortex Layer 6) cortico-thalamic 
 feedback direct suppression experiments as part of DFG grant "CRC1233 - Robust Vision".
 
-Maintainers: Lisa Schmors
+Maintainers: \
+Lisa Schmors @ Berens Lab, U Tübingen \
+Yannik Bauer @ Busse Lab, LMU Munich 
 
 ### Code structure
 The package hmov_code contains additional functions to analyze dLGN activity in the response to
