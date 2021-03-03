@@ -49,13 +49,25 @@ from djd.hmov_unit import plot_multi_traces
 # ukey = {'m': 'Ntsr1Cre_2019_0008', 's': 3, 'e': 7, 'u': 25, 'spl_paramset': 8}
 ukey = {'m': 'Ntsr1Cre_2020_0002', 's': 6, 'e': 6, 'u': 15}
 
+# %% [markdown]
+# ## Showcase multi-traces function
+
 # %%
-# Plot multi traces from hmov_unit.py
-# Using default figure parameters (does not work for very small figures (see below))
+# Plot multi traces - using HmovUnit() method: single test trace
+(HmovUnit() & ukey).plot_multi_traces(train_idx=[6], test_idx=[1], train_trange=None,
+                                      linewidth=1, colors=None, alpha_train=1, alpha_test=1,
+                                      spines=[], spine_pos=5, suptitle=False, plot_stim_rf=False, 
+                                      title_detail=False, figsize=None, save=False, save_fmt='pdf');
+
+# %%
+# Plot multi traces from hmov_unit.py: using multiple test traces
 plot_multi_traces(ukey, train_idx=[6], test_idx=None, train_trange=None,
-                      linewidth=1, colors=None, alpha_train=1, alpha_test=0.25,
-                      spines=[], spine_pos=5, suptitle=False, plot_stim_rf=False, 
-                      title_detail=True, figsize=None, save=True, save_fmt='pdf'); #figsize=(7.8, 2.7)
+                  linewidth=1, colors=None, alpha_train=1, alpha_test=0.25,
+                  spines=[], spine_pos=5, suptitle=False, plot_stim_rf=False, 
+                  title_detail=True, figsize=None, save=False, save_fmt='pdf');
+
+# %% [markdown]
+# ## Plot multi-traces figure for Fig1
 
 # %%
 ## Update plot parameters
@@ -66,7 +78,8 @@ plt.rcParams.update(mpl.rc_params_from_file('../../matplotlibrc', fail_on_error=
 plt.rcParams.update({
     'figure.dpi': 100,
     'figure.max_open_warning': 0, 
-    'axes.linewidth': 1,
+    'axes.linewidth': 0.5,
+    'xtick.major.width': 0.5,
     'axes.labelsize': 'medium',
     'font.sans-serif': ['Arial'],
     'pdf.fonttype': 42, # make text editable (otherwise saved as non-text path/shape)
@@ -78,7 +91,6 @@ plt.rcParams.update({
 plt.rcParams.update({
     'figure.dpi': 100,
     'figure.max_open_warning': 0, 
-    'axes.linewidth': 0.5,
     'axes.labelsize': 7.0,
     'axes.titlesize': 8,
     'xtick.labelsize': 7,
@@ -87,11 +99,17 @@ plt.rcParams.update({
 
 
 # %%
-# Plot multi traces from hmov_unit.py
-# Using specific fig pars does not work for v small figure panel
+# Plot multi traces from hmov_unit.py: single test trace
+plot_multi_traces(ukey, train_idx=[6], test_idx=[1], train_trange=None,
+                  linewidth=0.5, colors=None, alpha_train=1, alpha_test=1,
+                  spines=[], spine_pos=5, suptitle=False, plot_stim_rf=False, 
+                  title_detail=True, figsize=(9.7, 4.8), save=True, save_fmt='pdf');
+
+# %%
+# Plot multi traces from hmov_unit.py: multiple test traces
 plot_multi_traces(ukey, train_idx=[6], test_idx=None, train_trange=None,
-                      linewidth=1, colors=None, alpha_train=1, alpha_test=0.25,
-                      spines=[], spine_pos=5, suptitle=False, plot_stim_rf=False, 
-                      title_detail=True, figsize=(7.8, 2.7), save=True, save_fmt='pdf'); #figsize=(7.8, 2.7)
+                  linewidth=0.5, colors=None, alpha_train=1, alpha_test=0.25,
+                  spines=[], spine_pos=5, suptitle=False, plot_stim_rf=False, 
+                  title_detail=True, figsize=(9.7, 4.8), save=True, save_fmt='pdf');
 
 # %%
