@@ -17,12 +17,11 @@
 # # Plot multiple response measures to hollymov stimulus
 # Includes traces for average stimulus intensity, firing rate PSTH, pupil area, and locomotion.
 #
-# This is currently used as figure 1 panel h, where the multitraces output figure from this code is manually inserted into Hmov_L6S_paper/figs/fig_01.ai.
+# This is currently used as figure 1 panel f, where the multitraces output figure from this code is manually inserted into Hmov_L6S_paper/figs/fig_01.ai.
 
 # %% [markdown]
 # ## TODO
 #  - think about folder structure: if file number becomes too large, split into /code, /data, /figures
-#  - fix constrained_layout error for small figure panel
 
 # %% [markdown]
 # ## Setup
@@ -49,8 +48,24 @@ from djd.hmov_unit import plot_multi_traces
 # ukey = {'m': 'Ntsr1Cre_2019_0008', 's': 3, 'e': 7, 'u': 25, 'spl_paramset': 8}
 ukey = {'m': 'Ntsr1Cre_2020_0002', 's': 6, 'e': 6, 'u': 15}
 
+# Units that are opto sensitive and show FR transition w.r.t. locomotion onset (first choice)
+# ukey = {'m': 'Ntsr1Cre_2019_0008', 's': 5, 'e': 8, 'u': 19}
+# ukey = {'m': 'Ntsr1Cre_2019_0008', 's': 5, 'e': 8, 'u': 21}
+
+# Units that are opto sensitive, show different FR in run sit (but no transition at onset) (second choice)
+# ukey = {'m': 'Ntsr1Cre_2019_0008', 's': 3, 'e': 5, 'u': 5}
+# ukey = {'m': 'Ntsr1Cre_2019_0008', 's': 3, 'e': 5, 'u': 20}
+# ukey = {'m': 'Ntsr1Cre_2019_0008', 's': 3, 'e': 5, 'u': 22}
+
 # %% [markdown]
 # ## Showcase multi-traces function
+
+# %%
+# Plot multi traces - using HmovUnit() method: single test trace
+(HmovUnit() & ukey).plot_multi_traces(train_idx=[2], test_idx=None, train_trange=None,
+                                      linewidth=1, colors=None, alpha_train=1, alpha_test=0.25,
+                                      spines=[], spine_pos=5, suptitle=False, plot_stim_rf=False, 
+                                      title_detail=False, figsize=None, save=False, save_fmt='pdf');
 
 # %%
 # Plot multi traces - using HmovUnit() method: single test trace
