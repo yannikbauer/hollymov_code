@@ -62,7 +62,6 @@ plt.rcParams.update({
     'ps.fonttype': 42, # make text editable (otherwise saved as non-text path/shape)
     })
 
-
 # Dynamically update plot-specific pars
 plt.rcParams.update({
 #     'figure.dpi': 100,
@@ -76,47 +75,20 @@ plt.rcParams.update({
 
 
 # %%
-# mpl.rcParams.keys()
-
-# %% [markdown]
-# TODO:
-# - fix legend pos
-# - fix canvas position: reposition rasters to psth rather than vv
-# - rethink raster labelling: perhaps avoid side labels and just use one blue and one black raster
-# - allow figure to save fig itself (only once the above points are addressed)
-
-# %%
-fig, axs = (HmovUnit() & ukey).plot_opto_cond_raster_psth(optocond=['off-on', 'on-off'], stimcond='stim',
+# Plot raster+PSTH figure
+fig, axs = (HmovUnit() & ukey).plot_opto_cond_raster_psth(optocond=['off-on', 'off-off'], stimcond='stim',
                                                           offsets=[-0.5, -0.5], legend=False, legend_frame=False, 
-                                                          linewidths=[1, 1, 1, 1], s=0.5, figsize=[3.5, 4.5], dpi=200);
-axs[1].legend(ncol=2, frameon=False, loc='lower left', bbox_to_anchor=(1, 1))
-# fig.constrained_layout()
+                                                          linewidths=[1, 1, 1, 1], s=0.25, l=4, figsize=[3.7, 4.5], dpi=200,
+                                                          hspace=0.05, hpad=0., hratios=[0.45,0.55],
+                                                          eventfill=False, eventbar=True);
+# Manual plot edits
+for ax in axs[0]:
+    ax.set_ylabel('')
+axs[1].legend(['opto', 'ctrl'], ncol=2, frameon=False, loc='lower left', bbox_to_anchor=(0, 2.4),
+             columnspacing=1, handlelength=1.5, handletextpad=0.5, borderpad=0.1)  # will cause constr_layout Warn but ok now
+# NOTE: To accomodate manual legend, would need to adjust fig - this part is manually edited in Illustrator for now
+# plt.subplots_adjust(top=0.9)
+# fig.set_figheight(fig.get_figheight()+0.1)
 plt.savefig('raster_psth.pdf')
-
-# %%
-
-# %%
-
-# %%
-fig, axs = (HmovUnit() & ukey).plot_opto_cond_raster_psth(optocond=['off-on', 'on-off'], stimcond='stim',
-                                                          offsets=[-0.5, -0.5], legend=False, legend_frame=False, 
-                                                          figsize=[3.5, 4.5], dpi=200);
-
-# import pdb
-# pdb.set_trace()
-# dir(axs[1].get_legend())
-# axs[1].get_legend().set_title('')  # access object attributes via dir(axs[2].get_legend())
-# # axs[2].get_legend().get_texts()[0].set_text('control')
-# # axs[2].get_legend().get_texts()[1].set_text('opto')
-# axs[1].get_legend().set_bbox_to_anchor((1, 1.2))
-
-# %%
-
-# %% [markdown]
-# ## Showcase plot_opto_cond_raster_psth() 
-
-# %% jupyter={"outputs_hidden": true}
-(HmovUnit() & ukey).plot_opto_cond_raster_psth(optocond=['off-on', 'on-off'], stimcond='stim',
-                           offsets=[-0.5, -0.5], legend_frame=False, figsize=None, dpi=100);
 
 # %%
