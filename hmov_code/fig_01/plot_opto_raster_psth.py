@@ -77,59 +77,16 @@ plt.rcParams.update({
 
 
 # %%
-
-# %%
-
-# %%
 # Plot raster+PSTH figure
-fig, axs = (HmovUnit() & ukey).plot_opto_cond_raster_psth(optocond=['off-on', 'off-off'], stimcond='stim',
-                                                          offsets=[-0.5, -0.5], legend=False, legend_frame=False, 
+fig, axs = (HmovUnit() & ukey).plot_opto_cond_raster_psth(optocond=['off-on', 'off-off'], stimcond='stim', offsets=[-0.5, -0.5],
+                                                          plot_err='sd', legend=False, legend_frame=False, 
                                                           linewidths=[1, 1, 1, 1], alphas=[1.0, 0.5, 1.0, 0.5], 
-                                                          s=0.25, l=4, figsize=[3.7, 4.5], dpi=200,
-                                                          hspace=0.05, hpad=0., hratios=[0.45,0.55],
-                                                          eventfill=False, eventbar=True, evbarpos=25);
+                                                          s=0.25, l=4, eventfill=False, eventbar=True, evbarpos=25, 
+                                                          figsize=[3.7, 4.5], dpi=200, hspace=0.05, hpad=0., hratios=[0.45,0.55]);
 # Manual plot edits
 # for ax in axs[0]:
 #     ax.set_ylabel('')
 axs[0][-1].set_ylabel('')    
-axs[1].legend(['opto', 'ctrl'], ncol=2, frameon=False, loc='lower left', bbox_to_anchor=(0, 2.4),
-             columnspacing=1, handlelength=1.5, handletextpad=0.5, borderpad=0.1)  # will cause constr_layout Warn but ok now
-# NOTE: To accomodate manual legend, would need to adjust fig - this part is manually edited in Illustrator for now
-#       but could be done by inserting a third axis on top
-# plt.subplots_adjust(top=0.9)
-# fig.set_figheight(fig.get_figheight()+0.1)
-plt.savefig('opto_raster_psth.pdf')
-
-# %% jupyter={"outputs_hidden": true}
-# Plot raster+PSTH figure
-fig, axs = (HmovUnit() & ukey).plot_opto_cond_raster_psth(optocond=['off-on', 'off-off'], stimcond='stim',
-                                                          offsets=[-0.5, -0.5], legend=False, legend_frame=False, 
-                                                          linewidths=[1, 1, 1, 1], alphas=[1.0, 0.5, 1.0, 0.5], 
-                                                          s=0.25, l=4, figsize=[3.7, 4.5], dpi=200,
-                                                          hspace=0.05, hpad=0., hratios=[0.45,0.55],
-                                                          eventfill=False, eventbar=True, evbarpos=25);
-# Manual plot edits
-# for ax in axs[0]:
-#     ax.set_ylabel('')
-axs[0][-1].set_ylabel('')    
-axs[1].legend(['opto', 'ctrl'], ncol=2, frameon=False, loc='lower left', bbox_to_anchor=(0, 2.4),
-             columnspacing=1, handlelength=1.5, handletextpad=0.5, borderpad=0.1)  # will cause constr_layout Warn but ok now
-# NOTE: To accomodate manual legend, would need to adjust fig - this part is manually edited in Illustrator for now
-#       but could be done by inserting a third axis on top
-# plt.subplots_adjust(top=0.9)
-# fig.set_figheight(fig.get_figheight()+0.1)
-plt.savefig('opto_raster_psth.pdf')
-
-# %%
-# Plot raster+PSTH figure
-fig, axs = (HmovUnit() & ukey).plot_opto_cond_raster_psth(optocond=['off-on', 'off-off'], stimcond='stim',
-                                                          offsets=[-0.5, -0.5], legend=False, legend_frame=False, 
-                                                          linewidths=[1, 1, 1, 1], s=0.25, l=4, figsize=[3.7, 4.5], dpi=200,
-                                                          hspace=0.05, hpad=0., hratios=[0.45,0.55],
-                                                          eventfill=False, eventbar=True);
-# Manual plot edits
-for ax in axs[0]:
-    ax.set_ylabel('')
 axs[1].legend(['opto', 'ctrl'], ncol=2, frameon=False, loc='lower left', bbox_to_anchor=(0, 2.4),
              columnspacing=1, handlelength=1.5, handletextpad=0.5, borderpad=0.1)  # will cause constr_layout Warn but ok now
 # NOTE: To accomodate manual legend, would need to adjust fig - this part is manually edited in Illustrator for now
