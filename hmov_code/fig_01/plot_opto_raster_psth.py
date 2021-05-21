@@ -101,7 +101,7 @@ axs[1].legend(['opto', 'ctrl'], ncol=2, frameon=False, loc='lower left', bbox_to
 #       but could be done by inserting a third axis on top
 # plt.subplots_adjust(top=0.9)
 # fig.set_figheight(fig.get_figheight()+0.1)
-plt.savefig(f'opto_raster_psth_{ukey["m"]}_s{ukey["s"]}_e{ukey["e"]}_u{ukey["u"]}.pdf')
+plt.savefig(f'./figs/opto_raster_psth_{ukey["m"]}_s{ukey["s"]}_e{ukey["e"]}_u{ukey["u"]}.pdf')
 
 # %% [markdown]
 # ## Test other units w good responses for panels f,g,h
@@ -150,7 +150,7 @@ axs[1].legend(['opto', 'ctrl'], ncol=2, frameon=False, loc='lower left', bbox_to
 #       but could be done by inserting a third axis on top
 # plt.subplots_adjust(top=0.9)
 # fig.set_figheight(fig.get_figheight()+0.1)
-# plt.savefig('opto_raster_psth.pdf')
+# plt.savefig('./figs/opto_raster_psth.pdf')
 
 # %%
 ukey = {'m': 'Ntsr1Cre_2019_0008', 's': 5, 'e': 8, 'u': 21}
@@ -173,7 +173,7 @@ axs[1].legend(['opto', 'ctrl'], ncol=2, frameon=False, loc='lower left', bbox_to
 #       but could be done by inserting a third axis on top
 # plt.subplots_adjust(top=0.9)
 # fig.set_figheight(fig.get_figheight()+0.1)
-# plt.savefig('opto_raster_psth.pdf')
+# plt.savefig('./figs/opto_raster_psth.pdf')
 
 
 fig, axs = (HmovUnit() & ukey).plot_locomotion_raster_psth();
@@ -184,7 +184,7 @@ axs[1].legend(['run', 'sit'], ncol=2, frameon=False, loc='lower left',
               bbox_to_anchor=(0, 2.4),
               columnspacing=1, handlelength=1.5, handletextpad=0.5,
               borderpad=0.1)
-# plt.savefig('raster_psth_locomotion.pdf')
+# plt.savefig('./figs/raster_psth_locomotion.pdf')
 
 # %%
 ukey = {'m': 'Ntsr1Cre_2019_0008', 's': 3, 'e': 7, 'u': 5}
@@ -206,7 +206,7 @@ axs[1].legend(['opto', 'ctrl'], ncol=2, frameon=False, loc='lower left', bbox_to
 #       but could be done by inserting a third axis on top
 # plt.subplots_adjust(top=0.9)
 # fig.set_figheight(fig.get_figheight()+0.1)
-# plt.savefig('opto_raster_psth.pdf')
+# plt.savefig('./figs/opto_raster_psth.pdf')
 
 # %%
 ukey = {'m': 'Ntsr1Cre_2019_0008', 's': 3, 'e': 7, 'u': 20}
@@ -228,7 +228,7 @@ axs[1].legend(['opto', 'ctrl'], ncol=2, frameon=False, loc='lower left', bbox_to
 #       but could be done by inserting a third axis on top
 # plt.subplots_adjust(top=0.9)
 # fig.set_figheight(fig.get_figheight()+0.1)
-# plt.savefig('opto_raster_psth.pdf')
+# plt.savefig('./figs/opto_raster_psth.pdf')
 
 # %%
 ukey = {'m': 'Ntsr1Cre_2019_0008', 's': 3, 'e': 7, 'u': 22}
@@ -250,7 +250,7 @@ axs[1].legend(['opto', 'ctrl'], ncol=2, frameon=False, loc='lower left', bbox_to
 #       but could be done by inserting a third axis on top
 # plt.subplots_adjust(top=0.9)
 # fig.set_figheight(fig.get_figheight()+0.1)
-# plt.savefig('opto_raster_psth.pdf')
+# plt.savefig('./figs/opto_raster_psth.pdf')
 
 # %%
 
