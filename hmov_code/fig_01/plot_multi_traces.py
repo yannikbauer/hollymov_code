@@ -45,8 +45,8 @@ from djd.hmov_unit import plot_multi_traces
 
 # %%
 # Define example unit key
-# ukey = {'m': 'Ntsr1Cre_2019_0008', 's': 3, 'e': 7, 'u': 25, 'spl_paramset': 8}
-ukey = {'m': 'Ntsr1Cre_2020_0002', 's': 6, 'e': 6, 'u': 15}
+ukey = {'m': 'Ntsr1Cre_2019_0008', 's': 3, 'e': 7, 'u': 25, 'spl_paramset': 8}
+# ukey = {'m': 'Ntsr1Cre_2020_0002', 's': 6, 'e': 6, 'u': 15}
 
 # Units that are opto sensitive and show FR transition w.r.t. locomotion onset (first choice)
 # ukey = {'m': 'Ntsr1Cre_2019_0008', 's': 5, 'e': 8, 'u': 19}
@@ -61,6 +61,17 @@ ukey = {'m': 'Ntsr1Cre_2020_0002', 's': 6, 'e': 6, 'u': 15}
 # ## Showcase multi-traces function
 
 # %%
+ukey = {'m': 'Ntsr1Cre_2020_0002', 's': 6, 'e': 6, 'u': 15}
+
+# Plot multi traces - using HmovUnit() method: single test trace
+(HmovUnit() & ukey).plot_multi_traces(train_idx=[2], test_idx=None, train_trange=None,
+                                      linewidth=1, colors=None, alpha_train=1, alpha_test=0.25,
+                                      spines=[], spine_pos=5, suptitle=False, plot_stim_rf=False, 
+                                      title_detail=False, figsize=None, save=False, save_fmt='pdf');
+
+# %%
+ukey = {'m': 'Ntsr1Cre_2020_0002', 's': 6, 'e': 6, 'u': 15}
+
 # Plot multi traces - using HmovUnit() method: single test trace
 (HmovUnit() & ukey).plot_multi_traces(train_idx=[2], test_idx=None, train_trange=None,
                                       linewidth=1, colors=None, alpha_train=1, alpha_test=0.25,
@@ -114,16 +125,11 @@ plt.rcParams.update({
 
 
 # %%
-# Plot multi traces from hmov_unit.py: single test trace
-plot_multi_traces(ukey, train_idx=[6], test_idx=[1], train_trange=None,
-                  linewidth=0.5, colors=None, alpha_train=1, alpha_test=1,
-                  spines=[], spine_pos=5, suptitle=False, plot_stim_rf=False, 
-                  title_detail=True, figsize=(9.7, 4.8), save=True, save_fmt='pdf');
+ukey = {'m': 'Ntsr1Cre_2019_0008', 's': 5, 'e': 8, 'u': 19}
 
-# %%
-# Plot multi traces from hmov_unit.py: multiple test traces
-plot_multi_traces(ukey, train_idx=[6], test_idx=None, train_trange=None,
-                  linewidth=0.5, colors=None, alpha_train=1, alpha_test=0.25,
+# Plot multi traces from hmov_unit.py: single test trace
+plot_multi_traces(ukey, train_idx=[4], test_idx=[7], train_trange=None,
+                  linewidth=0.5, colors=None, alpha_train=1, alpha_test=1,
                   spines=[], spine_pos=5, suptitle=False, plot_stim_rf=False, 
                   title_detail=True, figsize=(9.7, 4.8), save=True, save_fmt='pdf');
 
