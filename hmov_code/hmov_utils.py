@@ -292,13 +292,14 @@ def get_file_name(key, paramdict, add_info=None, filetype='png'):
               'spl_eye_df'}
     assert params <= paramdict.keys(), ("paramdict misses necessary parameter.")
 
-    filename = ('{:s}_s{:02d}_e{:02d}_u{:02d}_{:s}_regularize{:.2E}_lr{:.2E}_iters{:d}_'
+    filename = ('{:s}_s{:02d}_e{:02d}_u{:02d}_paramset{:d}_{:s}_regularize{:.2E}_lr{:.2E}_iters{:d}_'
                 'spatdf{:d}_tempdf{:d}_nlag{:d}_pshf{:s}_pshflen{:d}_pshfdf{:d}_'
                 'opto{:s}_optolen{:d}_optodf{:d}_run{:s}_runlen{:d}_rundf{:d}_'
                 'eye{:s}_eyelen{:d}_eyedf{:d}').format(key['m'],
                                                             key['s'],
                                                             key['e'],
                                                             key['u'],
+                                                            paramdict['spl_paramset'],
                                                             paramdict['spl_stim'],
                                                             paramdict['spl_lambda'],
                                                             paramdict['spl_lr'],
