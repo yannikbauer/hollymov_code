@@ -263,3 +263,66 @@ def insert_year(mouse):
                 print('Renaming {:s} into {:s}'.format(dir_old, dir_new))
             else:
                 pass
+
+
+def get_file_name(key, paramdict, add_info=None, filetype='png'):
+    """ Returns filename to save figures specified for the unit and parameter set.
+
+    Parameters
+    ----------
+    key: dict
+        mseu info.
+    paramdict: dict
+        Contains all parameters used for the GLM model.
+    add_info: str
+        Additional info saved in the filename.
+    filetype: str
+        Default png.
+
+    Return
+    ------
+    filename: str
+        Filename specified for the unit and the parameters with the filetype.
+    """
+    assert {'m', 's', 'e', 'u'} <= key.keys(), ("Restriction must specify a single unit.")
+    params = {'spl_stim', 'spl_lambda', 'spl_lr', 'spl_max_iter', 'spl_spat_df', 'spl_temp_df',
+              'spl_nlag', 'spl_pshf', 'spl_pshf_len', 'spl_pshf_df', 'spl_opto',
+              'spl_opto_len',
+              'spl_opto_df', 'spl_run', 'spl_run_len', 'spl_run_df', 'spl_eye', 'spl_eye_len',
+              'spl_eye_df'}
+    assert params <= paramdict.keys(), ("paramdict misses necessary parameter.")
+
+    filename = ('{:s}_s{:02d}_e{:02d}_u{:02d}_paramset{:d}_{:s}_regularize{:.2E}_lr{:.2E}_iters{:d}_'
+                'spatdf{:d}_tempdf{:d}_nlag{:d}_pshf{:s}_pshflen{:d}_pshfdf{:d}_'
+                'opto{:s}_optolen{:d}_optodf{:d}_run{:s}_runlen{:d}_rundf{:d}_'
+                'eye{:s}_eyelen{:d}_eyedf{:d}').format(key['m'],
+                                                            key['s'],
+                                                            key['e'],
+                                                            key['u'],
+                                                            paramdict['spl_paramset'],
+                                                            paramdict['spl_stim'],
+                                                            paramdict['spl_lambda'],
+                                                            paramdict['spl_lr'],
+                                                            paramdict['spl_max_iter'],
+                                                            paramdict['spl_spat_df'],
+                                                            paramdict['spl_temp_df'],
+                                                            paramdict['spl_nlag'],
+                                                            str(paramdict['spl_pshf']),
+                                                            paramdict['spl_pshf_len'],
+                                                            paramdict['spl_pshf_df'],
+                                                            str(paramdict['spl_opto']),
+                                                            paramdict['spl_opto_len'],
+                                                            paramdict['spl_opto_df'],
+                                                            str(paramdict['spl_run']),
+                                                            paramdict['spl_run_len'],
+                                                            paramdict['spl_run_df'],
+                                                            str(paramdict['spl_eye']),
+                                                            paramdict['spl_eye_len'],
+                                                            paramdict['spl_eye_df'],
+                                                            )
+    if add_info is not None:
+        filename = '{:s}_{:s}'.format(filename, str(add_info))
+    filename = '{:s}.{:s}'.format(filename, filetype)
+
+    return filename
+
