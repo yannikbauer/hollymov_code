@@ -102,10 +102,11 @@ plt.rcParams.update(mpl.rc_params_from_file('../../matplotlibrc', fail_on_error=
 
 # Option 2: Dynamically update general pars (use if not updating from modified matplotlibrc)
 plt.rcParams.update({
-    'figure.dpi': 100,
+    'figure.dpi': 150,
     'figure.max_open_warning': 0, 
     'axes.linewidth': 0.5,
     'xtick.major.width': 0.5,
+    'ytick.major.width': 0.5,
     'axes.labelsize': 'medium',
     'font.sans-serif': ['Arial'],
     'pdf.fonttype': 42, # make text editable (otherwise saved as non-text path/shape)
@@ -115,8 +116,9 @@ plt.rcParams.update({
 
 # Dynamically update plot-specific pars
 plt.rcParams.update({
-    'figure.dpi': 100,
-    'figure.max_open_warning': 0, 
+    'figure.dpi': 150,
+    'figure.max_open_warning': 0,
+    'font.size': 8,
     'axes.labelsize': 7.0,
     'axes.titlesize': 8,
     'xtick.labelsize': 7,
