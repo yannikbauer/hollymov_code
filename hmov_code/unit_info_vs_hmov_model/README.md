@@ -1,4 +1,4 @@
-# L6S/unit_crit_and_type_info
+# Moved from L6S/unit_crit_and_type_info
 
 Code for extracting unit visual responsiveness criteria and unit type information.
 The information is extracted by a pipeline of functions and subfunctions, each of which extracts 
