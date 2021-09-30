@@ -1,0 +1,12 @@
+{
+    "save_df_name": "/Users/ybauer/GDrive/BBE_BusseBerensEuler/projects/ct-fb_L6_suppression/analyses/L6_suppression/l6s/unit_crit_and_type_info/data/unitexp_info_20210705.csv",
+    "add_basic_unitexp_info": [
+        "e_name",
+        "s_region",
+        "m_genotype"
+    ],
+    "default_crit": false,
+    "manual_crit": null,
+    "remove_dupl_unitexps": false,
+    "load_fr_df": false
+}

@@ -1,0 +1,12 @@
+{
+    "mouse_id": null,
+    "mouse_line": "Ntsr1-Cre",
+    "genotype": null,
+    "min_dob": null,
+    "sex": null,
+    "opsin": "stGtACR2",
+    "region": null,
+    "experiment": null,
+    "load_df_name": null,
+    "save_df_name": "default"
+}
