@@ -103,6 +103,9 @@ if not os.path.exists(fig_dir):
 # ### Check for good candidates
 
 # %%
+Mouse()
+
+# %%
 ## Loop through all cells sorted by best model
 # Get all keys with filter specifications
 keys = pd.DataFrame((SplineLNP.Eval() * SplineLNPParams() 
@@ -252,9 +255,47 @@ key = get_best_model(modkeys, crit='spl_r_test', key_only=True, format='dict')
 fig, axs = plot_model(key, strf_tlims=[-200, 0], title=True)
 
 # fname = os.path.join('.','figs', f"model_{ukey['m']}_s{ukey['s']}_e{ukey['e']}_u{ukey['u']}.pdf")
+# fname = os.path.join('.','figs', f"model_example_01.pdf")
+# print(f'Saving file to {fname}')
+# fig.savefig(fname)#, format='pdf')
+
+# %%
+# Define unit key
+ukey = {'m': 'Ntsr1Cre_2019_0008', 's': 5, 'e': 8, 'u': 19}  # Fig 1 unit
+
+# Restrict potential model keys for that unit
+modkeys = pd.DataFrame((SplineLNP() * SplineLNPParams() & ukey 
+                     & {'spl_pshf': 'False', 'spl_opto': 'True', 'spl_run': 'True', 'spl_eye': 'True'}).fetch(dj.key, as_dict=True))
+
+# Pick best model amongst viable model keys
+key = get_best_model(modkeys, crit='spl_r_test', key_only=True, format='dict')
+
+# Plot model
+fig, axs = plot_model(key, strf_tlims=[-200, 0], title=True)
+
+# fname = os.path.join('.','figs', f"model_{ukey['m']}_s{ukey['s']}_e{ukey['e']}_u{ukey['u']}.pdf")
 fname = os.path.join('.','figs', f"model_example_01.pdf")
 print(f'Saving file to {fname}')
 fig.savefig(fname)#, format='pdf')
+
+# %%
+# Define unit key
+# Define example unit key
+ukey = {'m': 'Ntsr1Cre_2019_0008', 's': 3, 'e': 7, 'u': 25}
+
+# Restrict potential model keys for that unit
+modkeys = pd.DataFrame((SplineLNP() * SplineLNPParams() & ukey 
+                     & {'spl_pshf': 'False', 'spl_opto': 'True', 'spl_run': 'True', 'spl_eye': 'True'}).fetch(dj.key, as_dict=True))
+
+# Pick best model amongst viable model keys
+key = get_best_model(modkeys, crit='spl_r_test', key_only=True, format='dict')
+
+# Plot model
+fig, axs = plot_model(key, strf_tlims=[-200, 0], title=True)
+# fname = os.path.join('.','figs', f"model_{ukey['m']}_s{ukey['s']}_e{ukey['e']}_u{ukey['u']}.pdf")
+# fname = os.path.join('.','figs', f"model_example_02.pdf")
+# print(f'Saving file to {fname}')
+# fig.savefig(fname)#, format='pdf')
 
 # %%
 # Define unit key
@@ -293,6 +334,27 @@ fig, axs = plot_model(key, strf_tlims=[-200, 0], title=True)
 
 fname = os.path.join('.','figs', f"model_{ukey['m']}_s{ukey['s']}_e{ukey['e']}_u{ukey['u']}.pdf")
 fname = os.path.join('.','figs', f"model_example_03.pdf")
+# print(f'Saving file to {fname}')
+# fig.savefig(fname)#, format='pdf')
+
+# %%
+# Define unit key
+# Define example unit key
+ukey = {'m': 'Ntsr1Cre_2019_0008', 's': 5, 'e': 8, 'u': 21}
+
+# Restrict potential model keys for that unit
+modkeys = pd.DataFrame((SplineLNP() * SplineLNPParams() & ukey 
+                     & {'spl_pshf': 'False', 'spl_opto': 'True', 'spl_run': 'True', 'spl_eye': 'True'}
+                       ).fetch(dj.key, as_dict=True))
+
+# Pick best model amongst viable model keys
+key = get_best_model(modkeys, crit='spl_r_test', key_only=True, format='dict')
+
+# Plot model
+fig, axs = plot_model(key, strf_tlims=[-200, 0], title=True)
+
+fname = os.path.join('.','figs', f"model_{ukey['m']}_s{ukey['s']}_e{ukey['e']}_u{ukey['u']}.pdf")
+fname = os.path.join('.','figs', f"model_example_03.pdf")
 print(f'Saving file to {fname}')
 fig.savefig(fname)#, format='pdf')
 
@@ -307,7 +369,10 @@ fig.savefig(fname)#, format='pdf')
 #     - makes 7.5 x 15 cm
 
 # %%
-fig, axs = SplineLNP().plot_performance_overview(keys=None, pshf_config=False, eval_metric='r', 
+# Select units
+keys_crit = HmovUnit().get_crit_set(fr_crit=0.1, opto=True, run=True, eye=True, excl_ctrl_m=True)
+
+fig, axs = SplineLNP().plot_performance_overview(keys=keys_crit, pshf_config=False, eval_metric='r', 
                                                  colors=None, num_cols=2, row_length=3.75, col_length=3.75,
                                                  verbose=True, add_first_subplot_space=0.3)
 fig.savefig('./figs/model_performance_overview_vert.pdf')
@@ -515,5 +580,31 @@ fig, axs = (SplineLNP() & keys_crit).plot_filter_split_by_modulation(mi_kind='rm
                                                                      verbose=True,
                                                                      figsize=(3.25, 4.5))
 fig.savefig('./figs/model_population_filters_run.pdf')
+
+# %% [markdown]
+# ### Eye filters
+
+# %% [markdown]
+# #### Eye filters for plot
+
+# %%
+keys_crit = HmovUnit().get_crit_set(fr_crit=0.1, opto=True, run=True, eye=True, excl_ctrl_m=True)
+
+thresh_upper=1.0
+thresh_lower=0.35
+
+
+fig, axs = (SplineLNP() & keys_crit).plot_filter_split_by_modulation(mi_kind='emi',
+                                                                     filter_len=40,
+                                                                     thresh_lower=thresh_lower,
+                                                                     thresh_upper=thresh_upper,                                                                      
+                                                                     zrange=[-.1, .1], 
+                                                                     keys=keys_crit,                                                                                                                                          
+                                                                     fr_crit=0.1, 
+                                                                     pshf_config=False,
+                                                                     data_fs=60, 
+                                                                     verbose=True,
+                                                                     figsize=(3.25, 4.5))
+fig.savefig('./figs/model_population_filters_eye.pdf')
 
 # %%
