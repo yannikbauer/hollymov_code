@@ -40,6 +40,7 @@ import seaborn as sns
 # from djd.hmov_models import _get_data
 # from djd.hmov_unit import plot_multi_traces
 from djd.glms import get_best_model, plot_model
+from djd.plot import cm2inch
 
 # Automatically reload modules to get code changes without restarting kernel
 # NOTE: Does not work for DJD table modules
@@ -70,8 +71,6 @@ plt.rcParams.update({
 
 # Dynamically update plot-specific pars
 plt.rcParams.update({
-    'figure.dpi': 150,
-    'figure.max_open_warning': 0,
     'font.size': 8,
     'axes.labelsize': 7.0,
     'axes.titlesize': 8,
@@ -336,5 +335,69 @@ fig, axs = (SplineLNP() & keys_crit).plot_filter_split_by_modulation(mi_kind='em
                                                                      verbose=True,
                                                                      figsize=(3.25, 4.5))
 fig.savefig('./figs/model_population_filters_eye.pdf')
+
+# %% [markdown]
+# ## Plot RF size & regularization
+
+# %%
+# Select units
+keys_crit = HmovUnit().get_crit_set(fr_crit=0.1, opto=True, run=True, eye=True, excl_ctrl_m=True)
+print('N units =', len(keys_crit))
+
+rf_areas = []
+reg_consts = []
+
+for key in keys_crit:
+    bm = get_best_model(key, model_type='SplineLNP', crit='spl_r_val', groupby=['m','s','u'],
+                   opto_config='True', opto_len='_', run_config='True', run_len='_',
+                   eye_config='True', eye_len='_', pshf_config='False', paramset_ids=None,
+                   key_only=True, format='dict',
+                   verbose=True)
+    rf_area = (SplineLNP.Eval() & bm).fetch1('spl_rf_area')
+    reg_const = (SplineLNPParams() & bm).fetch1('spl_lambda')
+    
+    rf_areas.append(rf_area)
+    reg_consts.append(reg_const)
+
+df = pd.DataFrame({'rf_area': rf_areas, 'regularization': reg_consts})
+
+# %% [markdown]
+# ### Plot RF area in one violinplot
+
+# %%
+fig, ax = plt.subplots(1,1,figsize=cm2inch((4.14, 3.44)), constrained_layout=True)
+sns.violinplot(data=df, y=rf_areas, color='white', bw=.3, ax=ax)#,)
+sns.swarmplot(data=df, y='rf_area', hue='regularization', x=[""]*len(df), size=3, alpha=0.6, palette='Reds', ax=ax)
+ax.set_ylabel('Receptive field area (deg$^2$)')
+ax.legend(frameon=False, title='$\lambda$', markerscale=0.5, bbox_to_anchor= (0.6, 1))
+sns.despine()
+fig.patch.set_facecolor('white')
+
+print(df[['rf_area']].agg(['median', 'mean', 'std', 'count']))
+
+fig.savefig('./figs/model_population_rf_area.pdf')
+
+# %% [markdown]
+# ### Plot RF area split by regularization
+
+# %%
+import matplotlib.colors
+
+colormap = 'husl'
+sns_cmap = sns.color_palette(colormap, 8).as_hex()
+cmap = matplotlib.colors.ListedColormap(sns_cmap)
+
+fig, ax = plt.subplots(1,1,figsize=(3,3), dpi=150)
+sns.violinplot(data=df, x='regularization', y='rf_area', palette=sns_cmap, inner="stick", bw=.2, ax=ax)
+ax.set_ylabel('Receptive field area (deg2)')
+ax.set_xlabel('Regularization constant')
+
+sns.despine()
+
+fig.patch.set_facecolor('white')
+
+print(df[['rf_area']].groupby(df['regularization']).agg(['median', 'mean', 'std', 'count']))
+
+#fig.savefig('./plots/RF_area_vs_reg_const.png', dpi=150, bbox_inches='tight', facecolor=fig.get_facecolor(), transparent=False)
 
 # %%
