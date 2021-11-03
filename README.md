@@ -13,7 +13,8 @@ Ann Kotkat @ Busse Lab, LMU Munich
 
 ### Code structure
 The package hmov_code contains the paper figure code in /hmov_code/, with subfolders for each 
-figure which contain Jupyter notebooks to generate the individual figure panels. For the 
+figure which contain Jupyter notebooks to generate the individual figure panels (folders 
+without the 'fig_' prefix contain code that does not yet produce a paper figure). For the 
 underlying analysis, as much code as possible lies in the Busse Lab repo 'djd', to keep the 
 figure generation code clean.
 Miscellaneous code is located in /notebooks/
