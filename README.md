@@ -61,3 +61,17 @@ Be aware that you need to be connected to the database first.
 
 Examples of the package usage can also be found in
 ``hollymov_code/notebooks/<latest_update>_test_hmov_utils.ipynb``
+
+
+### How the final figures are generated
+This code only generates the individual figure panels, which are assembled into the paper figures
+using Adobe Illustrator or Inkscape and are stored in the separate shared Google Drive folder
+`hmov_L6S_paper`. This method avoids cumbersome multi-panel figure tetris code and is more 
+flexible with respect to changes in figure layout. 
+
+Figure numbers in the name are avoided as much as possible to flexibly adapt to changing figure
+orders.
+
+Panels are already pre-specified in the correct dimensions and are inserted to scale in Adobe
+Illustrator via the `Place ...` command to easily update the panel in the figure when replacing
+the panel file.
