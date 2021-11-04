@@ -104,6 +104,15 @@ keys_crit = HmovUnit().get_crit_set(fr_crit=0.1, opto=True, run=True, eye=True, 
 fig, axs = SplineLNP().plot_performance_overview(keys=keys_crit, pshf_config=False, eval_metric='r', 
                                                  colors=None, num_cols=2, row_length=3.75, col_length=3.75,
                                                  verbose=True, add_first_subplot_space=0.3)
+# fig.savefig('./figs/model_performance_overview_vert.pdf')
+
+# %%
+# Select units
+keys_crit = HmovUnit().get_crit_set(fr_crit=0.1, opto=True, run=True, eye=True, excl_ctrl_m=True)
+
+fig, axs = SplineLNP().plot_performance_overview(keys=keys_crit, pshf_config=False, eval_metric='r', 
+                                                 colors=None, num_cols=2, row_length=3.75, col_length=3.75,
+                                                 verbose=True, add_first_subplot_space=0.3)
 fig.savefig('./figs/model_performance_overview_vert.pdf')
 
 # %%
@@ -337,36 +346,35 @@ fig, axs = (SplineLNP() & keys_crit).plot_filter_split_by_modulation(mi_kind='em
 fig.savefig('./figs/model_population_filters_eye.pdf')
 
 # %% [markdown]
-# ## Plot RF size & regularization
+# ## Plot model parameters
+
+# %% [markdown]
+# ### Get model parameters
 
 # %%
-# Select units
+# Select units: get keys of units meeting selection criteria
 keys_crit = HmovUnit().get_crit_set(fr_crit=0.1, opto=True, run=True, eye=True, excl_ctrl_m=True)
-print('N units =', len(keys_crit))
+keys_crit = pd.DataFrame(keys_crit)
+print('N units passing selection criteria =', len(keys_crit))
 
-rf_areas = []
-reg_consts = []
+# Get best model key for each unit (must be full model with opto+run+eye)
+keys_bestm = get_best_model(keys_crit, model_type='SplineLNP', crit='spl_r_val', groupby=['m','s','u'],
+                            opto_config='True', opto_len='_', run_config='True', run_len='_',
+                            eye_config='True', eye_len='_', pshf_config='False', paramset_ids=None,
+                            key_only=True, format='df', verbose=True)
 
-for key in keys_crit:
-    bm = get_best_model(key, model_type='SplineLNP', crit='spl_r_val', groupby=['m','s','u'],
-                   opto_config='True', opto_len='_', run_config='True', run_len='_',
-                   eye_config='True', eye_len='_', pshf_config='False', paramset_ids=None,
-                   key_only=True, format='dict',
-                   verbose=True)
-    rf_area = (SplineLNP.Eval() & bm).fetch1('spl_rf_area')
-    reg_const = (SplineLNPParams() & bm).fetch1('spl_lambda')
-    
-    rf_areas.append(rf_area)
-    reg_consts.append(reg_const)
-
-df = pd.DataFrame({'rf_area': rf_areas, 'regularization': reg_consts})
+# Get unit info for best models
+df = pd.DataFrame((SplineLNP.Eval() * SplineLNPParams() & keys_bestm
+                  ).fetch(dj.key, 'spl_rf_area', 'spl_rf_val', 'spl_lambda', as_dict=True))
+df.rename(columns={'spl_rf_area': 'rf_area', 'spl_rf_val': 'rf_polarity', 'spl_lambda': 'regularization'}, inplace=True)
+df
 
 # %% [markdown]
 # ### Plot RF area in one violinplot
 
 # %%
 fig, ax = plt.subplots(1,1,figsize=cm2inch((4.14, 3.44)), constrained_layout=True)
-sns.violinplot(data=df, y=rf_areas, color='white', bw=.3, ax=ax)#,)
+sns.violinplot(data=df, y='rf_area', color='white', bw=.3, ax=ax)#,)
 sns.swarmplot(data=df, y='rf_area', hue='regularization', x=[""]*len(df), size=3, alpha=0.6, palette='Reds', ax=ax)
 ax.set_ylabel('Receptive field area (deg$^2$)')
 ax.legend(frameon=False, title='$\lambda$', markerscale=0.5, bbox_to_anchor= (0.6, 1))
@@ -399,5 +407,48 @@ fig.patch.set_facecolor('white')
 print(df[['rf_area']].groupby(df['regularization']).agg(['median', 'mean', 'std', 'count']))
 
 #fig.savefig('./plots/RF_area_vs_reg_const.png', dpi=150, bbox_inches='tight', facecolor=fig.get_facecolor(), transparent=False)
+
+# %% [markdown]
+# ### Plot RF polarity
+
+# %%
+fig, ax = plt.subplots(1,1,figsize=cm2inch((4.14, 3.44)), constrained_layout=True)
+sns.violinplot(data=df, y='rf_polarity', color='white', inner='quartiles', bw=.3, ax=ax)#,)
+sns.swarmplot(data=df, y='rf_polarity', hue='rf_polarity', x=[""]*len(df), size=3, alpha=0.7, palette='coolwarm_r', 
+              vmin=-1, vmax=1, ax=ax)
+ax.set_ylabel('Receptive field polarity')
+# ax.legend(frameon=False, title='$\lambda$', markerscale=0.5, bbox_to_anchor= (0.6, 1))
+ax.legend([],[], frameon=False)
+sns.despine()
+fig.patch.set_facecolor('white')
+
+print(df[['rf_polarity']].agg(['median', 'mean', 'std', 'count']))
+
+fig.savefig('./figs/model_population_rf_polarity.pdf')
+
+# %% [markdown]
+# ### Plot RF area and polarity combined in one figure
+
+# %%
+fig, axs = plt.subplots(nrows=2, ncols=1, figsize=cm2inch((4.5, 7)), constrained_layout=True)
+
+# RF area
+sns.violinplot(data=df, y='rf_area', color='white', bw=.3, ax=axs[0])
+sns.swarmplot(data=df, y='rf_area', hue='regularization', x=[""]*len(df), size=3, alpha=0.6, palette='Reds', ax=axs[0])
+axs[0].set_ylabel('Receptive field area (deg$^2$)')
+axs[0].legend(frameon=False, title='$\lambda$', markerscale=0.5, bbox_to_anchor= (0.6, 1))
+
+# RF polarity
+sns.violinplot(data=df, y='rf_polarity', color='white', inner='quartiles', bw=.3, ax=axs[1])
+sns.swarmplot(data=df, y='rf_polarity', hue='rf_polarity', x=[""]*len(df), size=3, alpha=0.7, palette='coolwarm_r', 
+              vmin=-1, vmax=1.5, ax=axs[1])
+axs[1].set_ylabel('Receptive field polarity')
+axs[1].legend([],[], frameon=False)
+sns.despine()
+fig.patch.set_facecolor('white')
+
+print(df[['rf_polarity']].agg(['median', 'mean', 'std', 'count']))
+
+fig.savefig('./figs/model_population_rf_params.pdf')
 
 # %%
