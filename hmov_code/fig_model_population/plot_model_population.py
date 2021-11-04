@@ -447,8 +447,75 @@ axs[1].legend([],[], frameon=False)
 sns.despine()
 fig.patch.set_facecolor('white')
 
-print(df[['rf_polarity']].agg(['median', 'mean', 'std', 'count']))
+print(df[['rf_area', 'rf_polarity']].agg(['median', 'mean', 'std', 'count']))
 
 fig.savefig('./figs/model_population_rf_params.pdf')
 
+# %% [markdown]
+# ## TESTING: Get tRF full width half max FWHM
+# https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.find_peaks.html
+# https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.peak_widths.html
+
 # %%
+# Get model weights = stRFs
+df = pd.DataFrame((SplineLNP() & keys_bestm).fetch(dj.key, 'spl_w_opt', as_dict=True))
+df
+
+# %%
+# Extract tRFs
+from djd.glms import get_strf_comps  # gets stRF components from model weights
+
+# Get tRF for one good example unit model
+strf = df.iloc[2].spl_w_opt  
+sRF, tRF = get_strf_comps(strf)
+plt.plot(tRF)
+
+# %%
+# Apply get_strf_comps() to all models, returning only tRFs (2nd arg)
+df['tRF'] = df['spl_w_opt'].apply(lambda x: get_strf_comps(x)[1])  # lambda allows to select fn return arg by idx
+plt.plot(df.iloc[2].tRF)
+
+# %% [markdown]
+# ### Find width OPTION 1
+
+# %%
+# Find peaks
+import scipy
+
+# This finds multiple peaks and returns properties if width kwarg is given
+peaks, properties = scipy.signal.find_peaks(tRF, height=None, threshold=None, distance=None, 
+                                            prominence=None, width=1, wlen=None, rel_height=0.5, plateau_size=None)
+
+# %%
+peaks
+
+# %%
+properties
+
+# %%
+# Use prominences to extract highest peak
+maxidx = properties['prominences'].argmax()
+width = properties['widths'][maxidx]
+width
+
+# %% [markdown]
+# ### Find width OPTION 2 - more direct
+
+# %%
+maxpeak = np.array([tRF.argmax()])
+maxpeak
+
+# %%
+width, w_height, lips, rips = scipy.signal.peak_widths(tRF, maxpeak, rel_height=0.5, prominence_data=None, wlen=None)
+
+# %%
+(lips + (rips - lips)/2)[0]
+
+# %%
+plt.plot(tRF)
+plt.plot(maxpeak, tRF[maxpeak], "x")
+plt.hlines(w_height, lips, rips, color="C1", linestyle='--')
+plt.annotate(f'w = {width[0]:.2f}', ((lips + (rips - lips)/2)[0], w_height-0.05), va='top', ha='center')
+
+# %%
+# Apply width function to all models ...
