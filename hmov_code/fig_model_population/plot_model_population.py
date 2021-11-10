@@ -104,19 +104,13 @@ keys_crit = HmovUnit().get_crit_set(fr_crit=0.1, opto=True, run=True, eye=True, 
 fig, axs = SplineLNP().plot_performance_overview(keys=keys_crit, pshf_config=False, eval_metric='r', 
                                                  colors=None, num_cols=2, row_length=3.75, col_length=3.75,
                                                  verbose=True, add_first_subplot_space=0.3)
-# fig.savefig('./figs/model_performance_overview_vert.pdf')
+fig.savefig('./figs/model_performance_overview_vert.pdf')
 
 # %%
 # Select units
 keys_crit = HmovUnit().get_crit_set(fr_crit=0.1, opto=True, run=True, eye=True, excl_ctrl_m=True)
 
 fig, axs = SplineLNP().plot_performance_overview(keys=keys_crit, pshf_config=False, eval_metric='r', 
-                                                 colors=None, num_cols=2, row_length=3.75, col_length=3.75,
-                                                 verbose=True, add_first_subplot_space=0.3)
-fig.savefig('./figs/model_performance_overview_vert.pdf')
-
-# %%
-fig, axs = SplineLNP().plot_performance_overview(keys=None, pshf_config=False, eval_metric='r', 
                                                  colors=None, num_cols=4, row_length=2.75, col_length=3.375,
                                                  verbose=True, add_first_subplot_space=0.3)
 fig.savefig('./figs/model_performance_overview_horiz.pdf')
@@ -195,10 +189,11 @@ fig.savefig('./figs/model_population_filters_opto_02.pdf')
 # %%
 keys_crit = HmovUnit().get_crit_set(fr_crit=0.1, opto=True, run=True, eye=True, excl_ctrl_m=True)
 
-thresh_upper = -0.2
 thresh_lower = -1.0
+thresh_upper = -0.2
+filter_len = 20
 fig, axs = (SplineLNP() & keys_crit).plot_filter_split_by_modulation(mi_kind='omi',
-                                                                     filter_len=15,
+                                                                     filter_len=filter_len,
                                                                      thresh_lower=thresh_lower,
                                                                      thresh_upper=thresh_upper,                                                                      
                                                                      zrange=[-.1, .1], 
@@ -303,11 +298,12 @@ fig.savefig('./figs/model_population_filters_run_02.pdf')
 # %%
 keys_crit = HmovUnit().get_crit_set(fr_crit=0.1, opto=True, run=True, eye=True, excl_ctrl_m=True)
 
+thresh_lower=0.35
 thresh_upper=1.0
-thresh_lower=0.2
+filter_len=40
 
 fig, axs = (SplineLNP() & keys_crit).plot_filter_split_by_modulation(mi_kind='rmi',
-                                                                     filter_len=20,
+                                                                     filter_len=filter_len,
                                                                      thresh_lower=thresh_lower,
                                                                      thresh_upper=thresh_upper,                                                                      
                                                                      zrange=[-.1, .1], 
@@ -328,12 +324,12 @@ fig.savefig('./figs/model_population_filters_run.pdf')
 # %%
 keys_crit = HmovUnit().get_crit_set(fr_crit=0.1, opto=True, run=True, eye=True, excl_ctrl_m=True)
 
-thresh_upper=1.0
 thresh_lower=0.35
-
+thresh_upper=1.0
+filter_len=40
 
 fig, axs = (SplineLNP() & keys_crit).plot_filter_split_by_modulation(mi_kind='emi',
-                                                                     filter_len=40,
+                                                                     filter_len=filter_len,
                                                                      thresh_lower=thresh_lower,
                                                                      thresh_upper=thresh_upper,                                                                      
                                                                      zrange=[-.1, .1], 
@@ -457,6 +453,18 @@ fig.savefig('./figs/model_population_rf_params.pdf')
 # https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.peak_widths.html
 
 # %%
+# Select units: get keys of units meeting selection criteria
+keys_crit = HmovUnit().get_crit_set(fr_crit=0.1, opto=True, run=True, eye=True, excl_ctrl_m=True)
+keys_crit = pd.DataFrame(keys_crit)
+print('N units passing selection criteria =', len(keys_crit))
+
+# Get best model key for each unit (must be full model with opto+run+eye)
+keys_bestm = get_best_model(keys_crit, model_type='SplineLNP', crit='spl_r_val', groupby=['m','s','u'],
+                            opto_config='True', opto_len='_', run_config='True', run_len='_',
+                            eye_config='True', eye_len='_', pshf_config='False', paramset_ids=None,
+                            key_only=True, format='df', verbose=True)
+
+# %%
 # Get model weights = stRFs
 df = pd.DataFrame((SplineLNP() & keys_bestm).fetch(dj.key, 'spl_w_opt', as_dict=True))
 df
@@ -509,13 +517,20 @@ maxpeak
 width, w_height, lips, rips = scipy.signal.peak_widths(tRF, maxpeak, rel_height=0.5, prominence_data=None, wlen=None)
 
 # %%
-(lips + (rips - lips)/2)[0]
+w_height
 
 # %%
+lips
+
+# %%
+rips
+
+# %%
+fig, ax = plt.subplots(dpi=150)
 plt.plot(tRF)
 plt.plot(maxpeak, tRF[maxpeak], "x")
 plt.hlines(w_height, lips, rips, color="C1", linestyle='--')
-plt.annotate(f'w = {width[0]:.2f}', ((lips + (rips - lips)/2)[0], w_height-0.05), va='top', ha='center')
+plt.annotate(f'w = {width[0]:.2f}', ((lips + (rips - lips)/2), w_height-0.05), va='top', ha='center', fontsize=8)
 
 # %%
 # Apply width function to all models ...

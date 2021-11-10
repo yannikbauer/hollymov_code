@@ -835,9 +835,208 @@ slnp_pars4 = {
     'spl_eye_smooth': 'False',
 }
 
+# %% [markdown]
+# ### Exponential non-lin test paramset
+
+# %%
+exp_par10000 = (SplineLNPParams() & {'spl_paramset': 103}).fetch1()
+exp_par10000['spl_paramset'] = 10000
+exp_par10000['spl_distr'] = 'exponential'
+exp_par10000
+
+# %%
+exp_par10001 = (SplineLNPParams() & {'spl_paramset': 103}).fetch1()
+exp_par10001['spl_paramset'] = 10001
+exp_par10001['spl_distr'] = 'exponential'
+exp_par10001['spl_lambda'] = 5.0
+exp_par10001
+
+# %%
+exp_par10002 = (SplineLNPParams() & {'spl_paramset': 103}).fetch1()
+exp_par10002['spl_paramset'] = 10002
+exp_par10002['spl_distr'] = 'exponential'
+exp_par10002['spl_spat_df'] = 8
+exp_par10002['spl_temp_df'] = 5
+exp_par10002['spl_opto_df'] = 5
+exp_par10002['spl_run_df'] = 6
+exp_par10002['spl_eye_df'] = 6
+exp_par10002
+
+# %%
+exp_par10003 = (SplineLNPParams() & {'spl_paramset': 103}).fetch1()
+exp_par10003['spl_paramset'] = 10003
+exp_par10003['spl_distr'] = 'exponential'
+exp_par10003['spl_lambda'] = 5.0
+exp_par10003['spl_spat_df'] = 8
+exp_par10003['spl_temp_df'] = 5
+exp_par10003['spl_opto_df'] = 5
+exp_par10003['spl_run_df'] = 6
+exp_par10003['spl_eye_df'] = 6
+exp_par10003
+
+# %%
+exp_par = (SplineLNPParams() & {'spl_paramset': 103}).fetch1()
+exp_par.update({
+    'spl_paramset': 10004,
+    'spl_distr': 'exponential',
+    'spl_lambda': 5.0,
+    'spl_max_iter': 3000,
+    'spl_spat_df': 8,
+    'spl_temp_df': 5,
+    'spl_opto_df': 5,
+    'spl_run_df': 6,
+    'spl_eye_df': 6
+    })
+exp_par
+
+# %%
+exp_par = (SplineLNPParams() & {'spl_paramset': 103}).fetch1()
+exp_par.update({
+    'spl_paramset': 10005,
+    'spl_distr': 'exponential',
+    'spl_lambda': 5.0,
+    'spl_max_iter': 4000,
+    'spl_lr': 0.5,
+    'spl_spat_df': 8,
+    'spl_temp_df': 5,
+    'spl_opto_df': 5,
+    'spl_run_df': 6,
+    'spl_eye_df': 6
+    })
+exp_par
+
+# %%
+exp_par = (SplineLNPParams() & {'spl_paramset': 103}).fetch1()
+exp_par.update({
+    'spl_paramset': 10006,
+    'spl_distr': 'exponential',
+    'spl_lambda': 5.0,
+    'spl_max_iter': 4000,
+    'spl_lr': 0.4,
+    'spl_spat_df': 8,
+    'spl_temp_df': 5,
+    'spl_opto_df': 5,
+    'spl_run_df': 6,
+    'spl_eye_df': 6
+    })
+exp_par
+
+# %%
+exp_par = (SplineLNPParams() & {'spl_paramset': 103}).fetch1()
+exp_par.update({
+    'spl_paramset': 10007,
+    'spl_distr': 'exponential',
+    'spl_lambda': 5.0,
+    'spl_max_iter': 6000,
+    'spl_lr': 0.3,
+    'spl_spat_df': 8,
+    'spl_temp_df': 5,
+    'spl_opto_df': 5,
+    'spl_run_df': 6,
+    'spl_eye_df': 6
+    })
+exp_par
+
+# %%
+exp_par = (SplineLNPParams() & {'spl_paramset': 103}).fetch1()
+exp_par.update({
+    'spl_paramset': 10008,
+    'spl_distr': 'exponential',
+    'spl_lambda': 5.0,
+    'spl_max_iter': 1000,
+    'spl_lr': 0.35,
+    'spl_spat_df': 8,
+    'spl_temp_df': 5,
+    'spl_opto_df': 5,
+    'spl_run_df': 6,
+    'spl_eye_df': 6
+    })
+exp_par
+
+# %%
+exp_par = (SplineLNPParams() & {'spl_paramset': 103}).fetch1()
+exp_par.update({
+    'spl_paramset': 10009,
+    'spl_distr': 'exponential',
+    'spl_lambda': 5.0,
+    'spl_max_iter': 1000,
+    'spl_lr': 0.325,
+    'spl_spat_df': 8,
+    'spl_temp_df': 5,
+    'spl_opto_df': 5,
+    'spl_run_df': 6,
+    'spl_eye_df': 6
+    })
+exp_par
+
+# %%
+exp_par = (SplineLNPParams() & {'spl_paramset': 103}).fetch1()
+exp_par.update({
+    'spl_paramset': 10010,
+    'spl_distr': 'exponential',
+    'spl_lambda': 5.0,
+    'spl_max_iter': 1000,
+    'spl_lr': 0.3175,
+    'spl_spat_df': 8,
+    'spl_temp_df': 5,
+    'spl_opto_df': 5,
+    'spl_run_df': 6,
+    'spl_eye_df': 6
+    })
+exp_par
+
+# %%
+exp_par = (SplineLNPParams() & {'spl_paramset': 103}).fetch1()
+exp_par.update({
+    'spl_paramset': 10011,
+    'spl_distr': 'exponential',
+    'spl_lambda': 5.0,
+    'spl_max_iter': 3000,
+    'spl_lr': 0.325,
+    'spl_spat_df': 8,
+    'spl_temp_df': 5,
+    'spl_opto_df': 5,
+    'spl_run_df': 6,
+    'spl_eye_df': 6
+    })
+exp_par
+
 # %%
 # SplineLNPParams().populate(slnp_pars1)
-SplineLNPParams().populate(slnp_pars407)
+SplineLNPParams().populate(exp_par)
+
+# %%
+SplineLNP().populate({'m': 'Ntsr1Cre_2019_0008', 's': 5, 'e': 8, 'u': 19, 'spl_paramset': 10011}) # exp nonlin text paramset on Fig1 unit
+
+# %%
+SplineLNP().populate({'m': 'Ntsr1Cre_2019_0008', 's': 5, 'e': 8, 'u': 19, 'spl_paramset': 10010}) # exp nonlin text paramset on Fig1 unit
+
+# %%
+SplineLNP().populate({'m': 'Ntsr1Cre_2019_0008', 's': 5, 'e': 8, 'u': 19, 'spl_paramset': 10009}) # exp nonlin text paramset on Fig1 unit
+
+# %%
+SplineLNP().populate({'m': 'Ntsr1Cre_2019_0008', 's': 5, 'e': 8, 'u': 19, 'spl_paramset': 10008}) # exp nonlin text paramset on Fig1 unit
+
+# %%
+SplineLNP().populate({'m': 'Ntsr1Cre_2019_0008', 's': 5, 'e': 8, 'u': 19, 'spl_paramset': 10007}) # exp nonlin text paramset on Fig1 unit
+
+# %%
+SplineLNP().populate({'m': 'Ntsr1Cre_2019_0008', 's': 5, 'e': 8, 'u': 19, 'spl_paramset': 10006}) # exp nonlin text paramset on Fig1 unit
+
+# %%
+SplineLNP().populate({'m': 'Ntsr1Cre_2019_0008', 's': 5, 'e': 8, 'u': 19, 'spl_paramset': 10005}) # exp nonlin text paramset on Fig1 unit
+
+# %%
+SplineLNP().populate({'m': 'Ntsr1Cre_2019_0008', 's': 5, 'e': 8, 'u': 19, 'spl_paramset': 10004}) # exp nonlin text paramset on Fig1 unit
+
+# %%
+SplineLNP().populate({'m': 'Ntsr1Cre_2019_0008', 's': 5, 'e': 8, 'u': 19, 'spl_paramset': 10002}) # exp nonlin text paramset on Fig1 unit
+
+# %%
+SplineLNP().populate({'m': 'Ntsr1Cre_2019_0008', 's': 5, 'e': 8, 'u': 19, 'spl_paramset': 10001}) # exp nonlin text paramset on Fig1 unit
+
+# %%
+SplineLNP().populate({'m': 'Ntsr1Cre_2019_0008', 's': 5, 'e': 8, 'u': 19, 'spl_paramset': 10000}) # exp nonlin text paramset on Fig1 unit
 
 # %%
 # (SplineLNPParams() & {'spl_paramset': 5}).delete()
@@ -881,7 +1080,7 @@ GlmParams().populate(glm_pars)
 GlmParams()
 
 # %% [markdown]
-# ## Repopulate DB
+# ## Repopulate DB w build()
 
 # %%
 Unit.Spikes() & {'m':'Ntsr1Cre_2020_0001', 's':2, 'e':7}
@@ -963,6 +1162,23 @@ print(f'\nStop date and time: {datetime.now().strftime("%m/%d/%Y, %H:%M:%S")}'
 print(build_dict)
 
 # %%
+
+# %% [markdown]
+# ## Lisa's code for restricted paramest population
+
+# %%
+param_keys = (SplineLNPParams() & {'spl_stim':'hmov'} & {'spl_pshf':'False'}).fetch(dj.key)
+keys_crit = HmovUnit().get_crit_set(fr_crit=0.1, opto=True, run=True, eye=True, excl_ctrl_m=True)
+
+for param_key in param_keys:
+    for ukey in keys_crit:
+        pop_key = param_key.copy()
+        pop_key['m'] = ukey['m']
+        pop_key['s'] = ukey['s']
+        pop_key['e'] = ukey['e']
+        pop_key['u'] = ukey['u']
+
+        SplineLNP().populate(pop_key, reserve_jobs=True) 
 
 # %% [markdown]
 # ## Check DB tables
