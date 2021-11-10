@@ -285,7 +285,7 @@ def get_file_name(key, paramdict, add_info=None, filetype='png'):
         Filename specified for the unit and the parameters with the filetype.
     """
     assert {'m', 's', 'e', 'u'} <= key.keys(), ("Restriction must specify a single unit.")
-    params = {'spl_stim', 'spl_lambda', 'spl_lr', 'spl_max_iter', 'spl_spat_df', 'spl_temp_df',
+    params = {'spl_stim', 'spl_distr', 'spl_lambda', 'spl_lr', 'spl_max_iter', 'spl_spat_df', 'spl_temp_df',
               'spl_nlag', 'spl_pshf', 'spl_pshf_len', 'spl_pshf_df', 'spl_opto',
               'spl_opto_len',
               'spl_opto_df', 'spl_run', 'spl_run_len', 'spl_run_df', 'spl_eye', 'spl_eye_len',
