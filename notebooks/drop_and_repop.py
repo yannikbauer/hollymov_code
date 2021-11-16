@@ -1002,8 +1002,138 @@ exp_par.update({
 exp_par
 
 # %%
-# SplineLNPParams().populate(slnp_pars1)
+exp_par = (SplineLNPParams() & {'spl_paramset': 103}).fetch1()
+exp_par.update({
+    'spl_paramset': 10012,
+    'spl_distr': 'exponential',
+    'spl_lambda': 2.5,
+    'spl_max_iter': 6000,
+    'spl_lr': 0.3175,
+    'spl_spat_df': 13,
+    'spl_temp_df': 11,
+    'spl_opto_df': 11,
+    'spl_run_df': 13,
+    'spl_eye_df': 13
+    })
+exp_par
+
+# %%
+exp_par = (SplineLNPParams() & {'spl_paramset': 103}).fetch1()
+exp_par.update({
+    'spl_paramset': 10013,
+    'spl_distr': 'exponential',
+    'spl_lambda': 2.5,
+    'spl_max_iter': 6000,
+    'spl_lr': 0.3175,
+    'spl_spat_df': 13,
+    'spl_temp_df': 11,
+    'spl_opto_df': 11,
+    'spl_run_df': 13,
+    'spl_eye_df': 13
+    })
+exp_par
+
+# %%
+exp_par = (SplineLNPParams() & {'spl_paramset': 103}).fetch1()
+exp_par.update({
+    'spl_paramset': 10013,
+    'spl_distr': 'exponential',
+    'spl_lambda': 2.5,
+    'spl_max_iter': 6000,
+    'spl_lr': 0.3175,
+    'spl_spat_df': 13,
+    'spl_temp_df': 11,
+    'spl_opto_df': 11,
+    'spl_run_df': 13,
+    'spl_eye_df': 13
+    })
+exp_par
+
+# %%
+exp_par = (SplineLNPParams() & {'spl_paramset': 103}).fetch1()
+exp_par.update({
+    'spl_paramset': 10014,
+    'spl_distr': 'exponential',
+    'spl_lambda': 2.5,
+    'spl_max_iter': 6000,
+    'spl_lr': 0.2,
+    'spl_spat_df': 13,
+    'spl_temp_df': 11,
+    'spl_opto_df': 11,
+    'spl_run_df': 13,
+    'spl_eye_df': 13
+    })
+exp_par
+
+# %%
+exp_par = (SplineLNPParams() & {'spl_paramset': 103}).fetch1()
+exp_par.update({
+    'spl_paramset': 10015,
+    'spl_distr': 'exponential',
+    'spl_lambda': 2.5,
+    'spl_max_iter': 1800,
+    'spl_lr': 0.3,
+    'spl_spat_df': 13,
+    'spl_temp_df': 11,
+    'spl_opto_df': 11,
+    'spl_run_df': 13,
+    'spl_eye_df': 13
+    })
+exp_par
+
+# %%
+exp_par = (SplineLNPParams() & {'spl_paramset': 103}).fetch1()
+exp_par.update({
+    'spl_paramset': 10016,
+    'spl_distr': 'exponential',
+    'spl_lambda': 2.5,
+    'spl_max_iter': 1800,
+    'spl_lr': 0.3,
+    'spl_spat_df': 13,
+    'spl_temp_df': 11,
+    'spl_opto_df': 11,
+    'spl_run_df': 13,
+    'spl_eye_df': 13
+    })
+exp_par
+
+# %%
 SplineLNPParams().populate(exp_par)
+
+# %%
+# (SplineLNPParams() & {'spl_paramset': 10013}).delete()
+
+# %% [markdown]
+# #### Populate exp nonlin test paramset
+
+# %%
+# Trying out Lisa's multiplication of predictors before nonlin
+SplineLNP().populate({'m': 'Ntsr1Cre_2019_0008', 's': 5, 'e': 8, 'u': 19, 'spl_paramset': 10016}) # exp nonlin text paramset on Fig1 unit
+
+# %%
+# Trying out simple multiplication of predictors before nonlin
+SplineLNP().populate({'m': 'Ntsr1Cre_2019_0008', 's': 5, 'e': 8, 'u': 19, 'spl_paramset': 10016}) # exp nonlin text paramset on Fig1 unit
+
+# %%
+SplineLNP().populate({'m': 'Ntsr1Cre_2019_0008', 's': 5, 'e': 8, 'u': 19, 'spl_paramset': 10014}) # exp nonlin text paramset on Fig1 unit
+
+# %%
+SplineLNP().populate({'m': 'Ntsr1Cre_2019_0008', 's': 5, 'e': 8, 'u': 19, 'spl_paramset': 10015}) # exp nonlin text paramset on Fig1 unit
+
+# %%
+SplineLNP().populate({'m': 'Ntsr1Cre_2019_0008', 's': 5, 'e': 8, 'u': 19, 'spl_paramset': 10014}) # exp nonlin text paramset on Fig1 unit
+
+# %%
+SplineLNP().populate({'m': 'Ntsr1Cre_2019_0008', 's': 5, 'e': 8, 'u': 19, 'spl_paramset': 10013}) # exp nonlin text paramset on Fig1 unit
+
+# %%
+SplineLNP().populate({'m': 'Ntsr1Cre_2019_0008', 's': 5, 'e': 8, 'u': 19, 'spl_paramset': 10013}) # exp nonlin text paramset on Fig1 unit
+
+# %%
+SplineLNP().populate({'m': 'Ntsr1Cre_2019_0008', 's': 5, 'e': 8, 'u': 19, 'spl_paramset': 10013}) # exp nonlin text paramset on Fig1 unit
+
+# %%
+SplineLNP().populate({'m': 'Ntsr1Cre_2019_0008', 's': 5, 'e': 8, 'u': 19, 'spl_paramset': 10012}) # exp nonlin text paramset on Fig1 unit
 
 # %%
 SplineLNP().populate({'m': 'Ntsr1Cre_2019_0008', 's': 5, 'e': 8, 'u': 19, 'spl_paramset': 10011}) # exp nonlin text paramset on Fig1 unit

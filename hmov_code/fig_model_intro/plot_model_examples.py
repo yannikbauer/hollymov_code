@@ -289,6 +289,48 @@ ukey = {'m': 'Ntsr1Cre_2019_0008', 's': 5, 'e': 8, 'u': 19}  # Fig 1 unit
 
 # Restrict potential model keys for that unit
 modkeys = pd.DataFrame((SplineLNP() * SplineLNPParams() & ukey 
+                     & {'spl_paramset': 10014}
+                       ).fetch(dj.key, as_dict=True))
+
+# Pick best model amongst viable model keys
+key = get_best_model(modkeys, crit='spl_r_test', key_only=True, format='dict')
+
+# Plot model
+fig, axs = plot_model(key, strf_tlims=[-200, 0], title=True, eval_kind='r')
+
+# fname = os.path.join('.','figs', f"model_{ukey['m']}_s{ukey['s']}_e{ukey['e']}_u{ukey['u']}.pdf")
+# fname = os.path.join('.','figs', f"model_example_01.pdf")
+# print(f'Saving file to {fname}')
+# fig.savefig(fname)#, format='pdf')
+key
+
+# %%
+# Define unit key
+ukey = {'m': 'Ntsr1Cre_2019_0008', 's': 5, 'e': 8, 'u': 19}  # Fig 1 unit
+
+# Restrict potential model keys for that unit
+modkeys = pd.DataFrame((SplineLNP() * SplineLNPParams() & ukey 
+                     & {'spl_paramset': 10015}
+                       ).fetch(dj.key, as_dict=True))
+
+# Pick best model amongst viable model keys
+key = get_best_model(modkeys, crit='spl_r_test', key_only=True, format='dict')
+
+# Plot model
+fig, axs = plot_model(key, strf_tlims=[-200, 0], title=True, eval_kind='r')
+
+# fname = os.path.join('.','figs', f"model_{ukey['m']}_s{ukey['s']}_e{ukey['e']}_u{ukey['u']}.pdf")
+# fname = os.path.join('.','figs', f"model_example_01.pdf")
+# print(f'Saving file to {fname}')
+# fig.savefig(fname)#, format='pdf')
+key
+
+# %%
+# Define unit key
+ukey = {'m': 'Ntsr1Cre_2019_0008', 's': 5, 'e': 8, 'u': 19}  # Fig 1 unit
+
+# Restrict potential model keys for that unit
+modkeys = pd.DataFrame((SplineLNP() * SplineLNPParams() & ukey 
                      & {'spl_paramset': 10007}
                        ).fetch(dj.key, as_dict=True))
 
@@ -474,6 +516,26 @@ ukey = {'m': 'Ntsr1Cre_2019_0008', 's': 5, 'e': 8, 'u': 19}  # Fig 1 unit
 
 # Restrict potential model keys for that unit
 modkeys = pd.DataFrame((SplineLNP() * SplineLNPParams() & ukey 
+                     & {'spl_paramset': 103}
+                       ).fetch(dj.key, as_dict=True))
+
+# Pick best model amongst viable model keys
+key = get_best_model(modkeys, crit='spl_r_test', key_only=True, format='dict')
+
+# Plot model
+fig, axs = plot_model(key, strf_tlims=[-200, 0], title=True, eval_kind='r')
+
+# fname = os.path.join('.','figs', f"model_{ukey['m']}_s{ukey['s']}_e{ukey['e']}_u{ukey['u']}.pdf")
+# fname = os.path.join('.','figs', f"model_example_01.pdf")
+# print(f'Saving file to {fname}')
+# fig.savefig(fname)#, format='pdf')
+
+# %%
+# Define unit key
+ukey = {'m': 'Ntsr1Cre_2019_0008', 's': 5, 'e': 8, 'u': 19}  # Fig 1 unit
+
+# Restrict potential model keys for that unit
+modkeys = pd.DataFrame((SplineLNP() * SplineLNPParams() & ukey 
                      & {'spl_pshf': 'False', 'spl_opto': 'True', 'spl_run': 'True', 'spl_eye': 'True', 'spl_run_len': 40, 'spl_lambda': 2.5}
                        ).fetch(dj.key, as_dict=True))
 
@@ -607,5 +669,16 @@ fig, axs = plot_model(key, strf_tlims=[-200, 0], title=True)
 # fname = os.path.join('.','figs', f"model_example_02.pdf")
 # print(f'Saving file to {fname}')
 # fig.savefig(fname)#, format='pdf')
+
+# %% [markdown]
+# ### Plot STAs
+
+# %%
+ukey = {'m': 'Ntsr1Cre_2019_0008', 's': 5, 'e': 8, 'u': 19}  # Fig1 unit 1
+(HmovUnit & ukey).plot_STA(smooth='spline16', plot_center=True, title=True)
+
+# %%
+ukey = {'m': 'Ntsr1Cre_2020_0002', 's': 6, 'e': 6, 'u': 15, 'spl_paramset': 723}  # Fig1 unit 2
+(HmovUnit & ukey).plot_STA(smooth='spline16', plot_center=True, title=True)
 
 # %%
