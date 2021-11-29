@@ -301,7 +301,7 @@ def get_file_name(key, paramdict, add_info=None, filetype='png'):
                                                             key['u'],
                                                             paramdict['spl_paramset'],
                                                             paramdict['spl_stim'],
-                                                            paramdict['spl_lambda'],
+                                                            paramdict['spl_reg'],
                                                             paramdict['spl_lr'],
                                                             paramdict['spl_max_iter'],
                                                             paramdict['spl_spat_df'],
