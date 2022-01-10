@@ -285,17 +285,18 @@ def get_file_name(key, paramdict, add_info=None, filetype='png'):
         Filename specified for the unit and the parameters with the filetype.
     """
     assert {'m', 's', 'e', 'u'} <= key.keys(), ("Restriction must specify a single unit.")
-    params = {'spl_stim', 'spl_nonlin', 'spl_reg', 'spl_lr', 'spl_max_iter', 'spl_spat_df', 'spl_temp_df',
-              'spl_nlag', 'spl_pshf', 'spl_pshf_len', 'spl_pshf_df', 'spl_opto',
-              'spl_opto_len',
-              'spl_opto_df', 'spl_run', 'spl_run_len', 'spl_run_df', 'spl_eye', 'spl_eye_len',
-              'spl_eye_df'}
+    params = {'spl_paramset', 'spl_stim', 'spl_nonlin', 'spl_alpha', 'spl_reg', 'spl_lr', 'spl_max_iter', 
+              'spl_verb', 'spl_norm_y', 'spl_nlag', 'spl_shift', 
+              'spl_spat_df', 'spl_temp_df', 'spl_spat_scaling', 'spl_data_fs', 'spl_pshf', 
+              'spl_pshf_len', 'spl_pshf_df', 'spl_opto', 'spl_opto_len', 'spl_opto_df', 
+              'spl_run', 'spl_run_len', 'spl_run_df', 'spl_eye', 'spl_eye_len', 'spl_eye_df', 
+              'spl_n_folds', 'spl_fold_id', 'spl_test_size'}
     assert params <= paramdict.keys(), ("paramdict misses necessary parameter.")
 
     filename = ('{:s}_s{:02d}_e{:02d}_u{:02d}_paramset{:d}_{:s}_regularize{:.2E}_lr{:.2E}_iters{:d}_'
                 'spatdf{:d}_tempdf{:d}_nlag{:d}_pshf{:s}_pshflen{:d}_pshfdf{:d}_'
                 'opto{:s}_optolen{:d}_optodf{:d}_run{:s}_runlen{:d}_rundf{:d}_'
-                'eye{:s}_eyelen{:d}_eyedf{:d}').format(key['m'],
+                'eye{:s}_eyelen{:d}_eyedf{:d}_nfolds{:d}_foldID{:d}_testsize{:.2E}').format(key['m'],
                                                             key['s'],
                                                             key['e'],
                                                             key['u'],
@@ -319,6 +320,9 @@ def get_file_name(key, paramdict, add_info=None, filetype='png'):
                                                             str(paramdict['spl_eye']),
                                                             paramdict['spl_eye_len'],
                                                             paramdict['spl_eye_df'],
+                                                            paramdict['spl_n_folds'],
+                                                            paramdict['spl_fold_id'],
+                                                            paramdict['spl_test_size'],
                                                             )
     if add_info is not None:
         filename = '{:s}_{:s}'.format(filename, str(add_info))
