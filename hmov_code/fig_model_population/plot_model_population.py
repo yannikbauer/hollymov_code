@@ -101,6 +101,15 @@ if not os.path.exists(fig_dir):
 # Select units
 keys_crit = HmovUnit().get_crit_set(fr_crit=0.1, opto=True, run=True, eye=True, excl_ctrl_m=True)
 
+fig, axs = SplineLNP().plot_performance_overview(keys=keys_crit, pshf_config=False, eval_metric='r2', 
+                                                 colors=None, num_cols=2, row_length=3.75, col_length=3.75,
+                                                 verbose=True, add_first_subplot_space=0.3)
+# fig.savefig('./figs/model_performance_overview_vert.pdf')
+
+# %%
+# Select units
+keys_crit = HmovUnit().get_crit_set(fr_crit=0.1, opto=True, run=True, eye=True, excl_ctrl_m=True)
+
 fig, axs = SplineLNP().plot_performance_overview(keys=keys_crit, pshf_config=False, eval_metric='r', 
                                                  colors=None, num_cols=2, row_length=3.75, col_length=3.75,
                                                  verbose=True, add_first_subplot_space=0.3)
